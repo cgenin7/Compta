@@ -60,45 +60,43 @@ namespace Compta
             if (!string.IsNullOrEmpty(info.m_Warning) && !info.m_Warning.StartsWith(ClassTransactions.GOOD_NEWS))
             {
                 sToCome = sAccountName + info.m_TransactionName + ": double-cliquer pour vérifier l'avertissement.";
-                bAdded = true;
+                AddItemToCome(itemInListIndex, sToCome, copyInfo, nextPaiementDate);
             }
             else
             {
                 DateTime startDate = DateTime.Now;
                 copyInfo.m_Balance = 0;
-                int nbPaiements = 0;
                 while (nextPaiementDate.Date <= lastDayOfMonthTime.Date)
                 {
-                    double balance = copyInfo.m_Balance;
                     ClassCalculation.GetTransactionBalance(startDate, nextPaiementDate, ref copyInfo);
-                    copyInfo.m_Balance += balance;
                     if (copyInfo.m_Balance <= 0.01)
                         break;
                     
                     bAdded = true;
-                    nbPaiements++;
-                    sToCome = sAccountName + TextFormatter.FormatToComeTransactionText(copyInfo, nextPaiementDate, nbPaiements);
+                    sToCome = sAccountName + TextFormatter.FormatToComeTransactionText(copyInfo, nextPaiementDate);
                     startDate = nextPaiementDate.AddDays(1);
                     DateTime oldNextPaimentDate = nextPaiementDate;
                     nextPaiementDate = Util.GetNextPaiementDate(copyInfo, nextPaiementDate);
+
+                    AddItemToCome(itemInListIndex, sToCome, copyInfo, nextPaiementDate);
                     if (oldNextPaimentDate.Date == nextPaiementDate.Date)
                         break;
                 }
             }
-            if (bAdded)
-            {
-                TDisplayInfo displayInfo = new TDisplayInfo(sToCome, copyInfo.m_ID, copyInfo.m_Type, copyInfo.m_AccountId);
-                
-                displayInfo.Date = nextPaiementDate;
-                if (itemInListIndex >= 0)
-                    listBoxToCome0.Items[itemInListIndex] = displayInfo;
-                else
-                    listBoxToCome0.Items.Add(displayInfo);
-            }
-
             if (!bAdded && itemInListIndex >= 0)
                 listBoxToCome0.Items.RemoveAt(itemInListIndex);
             listBoxToCome0.Sorted = true;
+        }
+
+        public void AddItemToCome(int itemInListIndex, string sToCome, TTransactionInfo copyInfo, DateTime nextPaiementDate)
+        {
+            TDisplayInfo displayInfo = new TDisplayInfo(sToCome, copyInfo.m_ID, copyInfo.m_OrderID, copyInfo.m_Type, copyInfo.m_AccountId);
+
+            displayInfo.Date = nextPaiementDate;
+            if (itemInListIndex >= 0)
+                listBoxToCome0.Items[itemInListIndex] = displayInfo;
+            else
+                listBoxToCome0.Items.Add(displayInfo);
         }
 
         public void DeleteToComeTransaction(int ID)
@@ -631,7 +629,6 @@ namespace Compta
 
         private void FillUpPredictedBalances()
         {
-            DateTime endDate = CurrentEndPredictionDate;
             DateTime startDate = (DateTime.Now.Date >= CurrentStartPredictionDate.Date ? DateTime.Now.AddDays(1) : CurrentStartPredictionDate);
 
             TAnnualRepartitionInfo annualInfo = ComptaCharts.InitializeChartAnnuals(chartAnnuals, LocalSettings.BudgetYear, m_currentAccountId, false);
@@ -655,14 +652,11 @@ namespace Compta
             }
             labelAnnualProfits.Text += ClassTools.ConvertCurrencyToString(surplus) + " (" + ClassTools.ConvertDoubleToString(percentage) + "%)";
             
-            
-            if (endDate <= DateTime.Now)
-                return;
-
-            ComptaCharts comptaCharts = new ComptaCharts(this);
             double soldeActuel = Utils.ConvertToDouble(textBoxSoldeActuel0.Text.Trim());
-                    
-            comptaCharts.InitializeChartPredictedBalances(chartPredictedBalances, startDate, endDate, soldeActuel);
+
+            var lastDayOfMonth = new DateTime(startDate.Year, startDate.Month, 1).AddMonths(1).AddDays(-1);
+
+            ComptaCharts.InitializeChartPredictedBalances(this, chartPredictedBalances, startDate, lastDayOfMonth, soldeActuel, EPeriodLength.e_PerDay);
         }
         
         private void AddPlacementsInList()
@@ -688,7 +682,7 @@ namespace Compta
         {
             string textToDisplay = TextFormatter.FormatPlacementText(info);
             double percentage;
-            TDisplayInfo displayInfo = new TDisplayInfo(textToDisplay, info.m_ID, EType.e_Placement, -1);        
+            TDisplayInfo displayInfo = new TDisplayInfo(textToDisplay, info.m_ID, 0, EType.e_Placement, -1);        
 
             if (textToDisplay != "")
             {
@@ -975,19 +969,15 @@ namespace Compta
             TDisplayInfo info1 = listBoxToReorder.Items[listBoxIndex1] as TDisplayInfo;
             TDisplayInfo info2 = listBoxToReorder.Items[listBoxIndex2] as TDisplayInfo;
 
-            int id1 = info1.ID;
-            int id2 = info2.ID;
-            info1.ID = id2;
-            info2.ID = id1;
+            info1.OrderIndex = listBoxIndex2;
+            info2.OrderIndex = listBoxIndex1;
 
-            if (ClassTransactions.GetTransactions().Transactions.ContainsKey(id1) && ClassTransactions.GetTransactions().Transactions.ContainsKey(id2))
+            if (ClassTransactions.GetTransactions().Transactions.ContainsKey(info1.ID) && ClassTransactions.GetTransactions().Transactions.ContainsKey(info2.ID))
             {
-                TTransactionInfo transInfo1 = ClassTransactions.GetTransactions().Transactions[id1];
-                TTransactionInfo transInfo2 = ClassTransactions.GetTransactions().Transactions[id2];
-                transInfo1.m_ID = id2;
-                transInfo2.m_ID = id1;
-                ClassTransactions.GetTransactions().Transactions[id1] = transInfo2;
-                ClassTransactions.GetTransactions().Transactions[id2] = transInfo1;
+                TTransactionInfo transInfo1 = ClassTransactions.GetTransactions().Transactions[info1.ID];
+                TTransactionInfo transInfo2 = ClassTransactions.GetTransactions().Transactions[info2.ID];
+                transInfo1.m_OrderID = listBoxIndex2;
+                transInfo2.m_OrderID = listBoxIndex1;
             }
             listBoxToReorder.Items[listBoxIndex1] = info2;
             listBoxToReorder.Items[listBoxIndex2] = info1;

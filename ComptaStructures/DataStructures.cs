@@ -59,7 +59,7 @@ namespace ComptaCommun
 
     public class TDisplayInfo
     {
-        public TDisplayInfo(string displayString, int id, EType type, int accountId)
+        public TDisplayInfo(string displayString, int id, int orderId, EType type, int accountId)
         {
             DisplayString = displayString;
             ID = id;
@@ -69,6 +69,7 @@ namespace ComptaCommun
 
         public string DisplayString;
         public int ID;
+        public int OrderIndex;
         public EType DataType;
         public DateTime Date;
         public int AccountId;
@@ -146,6 +147,7 @@ namespace ComptaCommun
         public ETransactionType m_eTransactionType;
 
         public int m_ID;
+        public int m_OrderID;
         public EType m_Type;
         public int m_AccountId = -1;
         public string m_TransactionName;
@@ -212,6 +214,7 @@ namespace ComptaCommun
             m_FirstPaiementDate = info.m_FirstPaiementDate;
             m_FirstTimeInMonth = info.m_FirstTimeInMonth;
             m_ID = info.m_ID;
+            m_OrderID = info.m_OrderID;
             m_TransactionMode = info.m_TransactionMode;
             m_LastPaiementDate = info.m_LastPaiementDate;
             m_NbRemainingPaiements = info.m_NbRemainingPaiements;
@@ -228,7 +231,7 @@ namespace ComptaCommun
             m_Warning = info.m_Warning;
             m_Category = info.m_Category;
             m_RemoveFromAnnualReport = info.m_RemoveFromAnnualReport;
-
+            
             m_PretInterestRate = info.m_PretInterestRate;
             m_PretPaiementType = info.m_PretPaiementType;
             m_PretAmortissementMonths = info.m_PretAmortissementMonths;

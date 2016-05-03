@@ -111,7 +111,7 @@ namespace ComptaDB
             if (ClassDataAccess.OpenComptaDataSource(out DBConnection))
             {
                 //create the command object and store the sql query
-                OleDbCommand aCommand = new OleDbCommand("SELECT * FROM TransactionInfo ORDER BY ID", DBConnection);
+                OleDbCommand aCommand = new OleDbCommand("SELECT * FROM TransactionInfo ORDER BY OrderID", DBConnection);
                 try
                 {
                     //create the datareader object to connect to table
@@ -154,16 +154,16 @@ namespace ComptaDB
                                 info.m_PretAmortissementMonths = (int)aReader.GetDouble(22);
                             info.m_PretType = (EPretType)aReader.GetInt16(23);
                             info.m_RemoveFromAnnualReport = (aReader.GetInt16(24) == 0 ? false : true);
-
                             try
                             {
                                 info.m_PretInterestsPaiedDay = aReader.GetInt16(25);
+                                info.m_OrderID = aReader.GetInt16(26);
                             }
                             catch
                             {
                                 info.m_PretInterestsPaiedDay = 1;
+                                info.m_OrderID = 0;
                             }
-
                             if (transactionToFind != null)
                             {
                                 if (transactionToFind.IsEqual(info))
@@ -199,14 +199,14 @@ namespace ComptaDB
 
             return "INSERT INTO TransactionInfo (AccountId, TransactionName, Category, TransactionType, Amount, StartDate, EndDate, Period, PeriodLength, " +
                 " FirstTimeInMonth, SecondTimeInMonth, AmountAlreadyPayed, Notes, TransactionMode, NextVirementDate, NextVirementAmount, Type, " +
-                " InterestRate, PretPaiementType, PretPaiement, PretType, RemoveFromAnnualReport, PretInterestsPaiedDay) VALUES (" +
+                " InterestRate, PretPaiementType, PretPaiement, PretType, RemoveFromAnnualReport, PretInterestsPaiedDay, OrderID) VALUES (" +
                 info.m_AccountId + ", '" + info.m_TransactionName.Replace("'", "''") + "', " + info.m_Category + ", " + (int)info.m_eTransactionType + ", " +
                 info.m_Amount.ToString(NumberFormatInfo.InvariantInfo) + ", '" + info.m_StartDate.ToShortDateString() + "', '" + info.m_EndDate.ToShortDateString() + "', " +
                 info.m_Period.ToString() + ", " + (int)info.m_PeriodLength + ", " + info.m_FirstTimeInMonth + ", " + info.m_SecondTimeInMonth + ", '" +
                 info.m_AmountAlreadyPayed + "', '" + info.m_Note.Replace("'", "''") + "', " + (int)info.m_TransactionMode +
                 ", '" + info.m_nextVirementDate.ToShortDateString() + "', " + info.m_nextVirementAmount.ToString(NumberFormatInfo.InvariantInfo) + ", " + 
                 (int)info.m_Type + ", " + info.m_PretInterestRate.ToString(NumberFormatInfo.InvariantInfo) + ", " + (int)info.m_PretPaiementType + ", " + pretPaiement.ToString(NumberFormatInfo.InvariantInfo) +
-                ", " + (int)info.m_PretType + ", " + info.m_RemoveFromAnnualReport + ", " + info.m_PretInterestsPaiedDay + ")";
+                ", " + (int)info.m_PretType + ", " + info.m_RemoveFromAnnualReport + ", " + info.m_PretInterestsPaiedDay + ",  " + info.m_OrderID + ")";
         }
 
         private static string FormatUpdateTransactionInfoValues(TTransactionInfo info)
@@ -223,7 +223,8 @@ namespace ComptaDB
                 "', Notes = '" + info.m_Note.Replace("'", "''") + "', TransactionMode = " + (int)info.m_TransactionMode + 
                 ", NextVirementDate = '" + info.m_nextVirementDate.ToShortDateString() + "',  NextVirementAmount = " + info.m_nextVirementAmount.ToString(NumberFormatInfo.InvariantInfo)
                 + ", Type = " + (int)info.m_Type + ", InterestRate = " + info.m_PretInterestRate.ToString(NumberFormatInfo.InvariantInfo) + ", PretPaiementType = " + (int)info.m_PretPaiementType + ", PretPaiement = " + pretPaiement.ToString(NumberFormatInfo.InvariantInfo) +
-                ", PretType = " + (int)info.m_PretType + ", RemoveFromAnnualReport = " + info.m_RemoveFromAnnualReport + ", PretInterestsPaiedDay = " + info.m_PretInterestsPaiedDay + " WHERE ID = " + info.m_ID;
+                ", PretType = " + (int)info.m_PretType + ", RemoveFromAnnualReport = " + info.m_RemoveFromAnnualReport + 
+                ", PretInterestsPaiedDay = " + info.m_PretInterestsPaiedDay + ", OrderID = " + info.m_OrderID + " WHERE ID = " + info.m_ID;
         }
 
     }

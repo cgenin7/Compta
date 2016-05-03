@@ -110,71 +110,53 @@ namespace Compta
             return new TAnnualRepartitionInfo();
         }
         
-        public void InitializeChartPredictedBalances(Chart chartPredictedBalances, DateTime startDate, DateTime endDate, double soldeActuel)
+        public static void InitializeChartPredictedBalances(FormMain main, Chart chartPredictedBalances, DateTime startDate, DateTime endDate, double soldeActuel, EPeriodLength period)
         {
             try
             {
-                chartPredictedBalances.Visible = true;
-
-                chartPredictedBalances.Series.Clear();
-                chartPredictedBalances.Series.Add(new Series());
-
-                chartPredictedBalances.AntiAliasing = AntiAliasingStyles.Text;
-
-                chartPredictedBalances.Series[0].ChartType = SeriesChartType.Column;
-                chartPredictedBalances.Series[0]["DrawingStyle"] = "Cylinder";
-                chartPredictedBalances.Series[0]["PointWidth"] = "0.6";
-                chartPredictedBalances.Series[0].SmartLabelStyle.Enabled = true;
-                chartPredictedBalances.Series[0].LabelAngle = 0;
-                chartPredictedBalances.Series[0].LabelBackColor = CustomColors.MediumGrey;
-                
-                chartPredictedBalances.ChartAreas[0].AxisX.LabelStyle.Interval = 1;
-                chartPredictedBalances.ChartAreas[0].AxisY.LabelStyle.Format = "0 $";
-
-                chartPredictedBalances.ChartAreas[0].BackColor = CustomColors.LightGrey;
-                chartPredictedBalances.ChartAreas[0].BackSecondaryColor = Color.White;
-                chartPredictedBalances.ChartAreas[0].BackGradientStyle = GradientStyle.TopBottom;
-
-                chartPredictedBalances.Series[0].Font = new Font("Arial", (float)8, FontStyle.Regular);
-                chartPredictedBalances.Series[0]["MaxPixelPointWidth"] = "10";
-
-                chartPredictedBalances.Series[0].Points.Clear();
+                InitializeChartInfo(chartPredictedBalances);
 
                 int entryNb = 0;
                 DateTime startPredictionDate = startDate;
-                    
+
                 while (startDate.Date <= endDate.Date)
                 {
-                    DateTime endPredictionDate = new DateTime(startDate.Year, startDate.Month, 1).AddMonths(1).AddDays(-1);
-                    double soldePredit = 0;
+                    DateTime endPredictionDate;
 
-                    if (m_mainForm.CurrentAccountId == -1)
+                    if (period == EPeriodLength.e_PerDay)
+                        endPredictionDate = new DateTime(startDate.Year, startDate.Month, startDate.Day).AddDays(1);
+                    else if (period == EPeriodLength.e_PerWeek)
+                        endPredictionDate = new DateTime(startDate.Year, startDate.Month, startDate.Day).AddDays(7);
+                    else
+                        endPredictionDate = new DateTime(startDate.Year, startDate.Month, 1).AddMonths(1).AddDays(-1);
+
+                    if (endPredictionDate <= endDate.Date)
                     {
-                        foreach (TAccountInfo account in ClassAccounts.GetAccounts().AccountsInfo.Values)
+                        double soldePredit = 0;
+
+                        if (main.CurrentAccountId == -1)
                         {
-                            TPredictedBalance predictedBalanceInfo = new TPredictedBalance(account.AccountId, startPredictionDate, endPredictionDate);
-                            soldePredit += m_mainForm.GetPredictedBalanceAtSpecificDate(account.Balance, ref predictedBalanceInfo);
+                            foreach (TAccountInfo account in ClassAccounts.GetAccounts().AccountsInfo.Values)
+                            {
+                                TPredictedBalance predictedBalanceInfo = new TPredictedBalance(account.AccountId, startPredictionDate, endPredictionDate);
+                                soldePredit += main.GetPredictedBalanceAtSpecificDate(account.Balance, ref predictedBalanceInfo);
+                            }
                         }
+                        else
+                        {
+                            DateTime predictionDate = new DateTime(startDate.Year, startDate.Month, 1).AddMonths(1).AddDays(-1);
+                            TPredictedBalance predictedBalanceInfo = new TPredictedBalance(main.CurrentAccountId, startPredictionDate, endPredictionDate);
+                            soldePredit = main.GetPredictedBalanceAtSpecificDate(soldeActuel, ref predictedBalanceInfo);
+                        }
+
+                        AddEntryInPredictionChart(chartPredictedBalances, startPredictionDate, endPredictionDate, soldePredit, ref entryNb);
                     }
+                    if (period == EPeriodLength.e_PerDay)
+                        startDate = startDate.AddDays(1);
+                    else if (period == EPeriodLength.e_PerWeek)
+                        startDate = startDate.AddDays(7);
                     else
-                    {
-                        DateTime predictionDate = new DateTime(startDate.Year, startDate.Month, 1).AddMonths(1).AddDays(-1);
-                        TPredictedBalance predictedBalanceInfo = new TPredictedBalance(m_mainForm.CurrentAccountId, startPredictionDate, endPredictionDate);
-                        soldePredit = m_mainForm.GetPredictedBalanceAtSpecificDate(soldeActuel, ref predictedBalanceInfo);
-                    }
-                    
-                    int predictedBalance = (int)soldePredit;
-                    
-                    chartPredictedBalances.Series[0].Points.AddXY(endPredictionDate.ToString("MMMM"), predictedBalance);
-                    chartPredictedBalances.Series[0].Points[entryNb].Label = ClassTools.ConvertCurrencyToString(predictedBalance);
-                    chartPredictedBalances.Series[0].Points[entryNb].LabelToolTip = ClassTools.ConvertCurrencyToString(predictedBalance);
-                    entryNb++;
-                    int curPoint = chartPredictedBalances.Series[0].Points.Count - 1;
-                    if (predictedBalance >= 0)
-                        chartPredictedBalances.Series[0].Points[curPoint].Color = Color.DarkGreen;
-                    else
-                        chartPredictedBalances.Series[0].Points[curPoint].Color = Color.DarkRed;
-                    startDate = startDate.AddMonths(1);
+                        startDate = startDate.AddMonths(1);
                 }
             }
             catch (Exception ex)
@@ -305,6 +287,50 @@ namespace Compta
                     MessageBox.Show(ex.Message + " (" + ex.StackTrace + ")", "Erreur");
                 }
             }
+        }
+
+        private static void InitializeChartInfo(Chart chartPredictedBalances)
+        {
+            chartPredictedBalances.Visible = true;
+
+            chartPredictedBalances.Series.Clear();
+            chartPredictedBalances.Series.Add(new Series());
+
+            chartPredictedBalances.AntiAliasing = AntiAliasingStyles.Text;
+
+            chartPredictedBalances.Series[0].ChartType = SeriesChartType.Column;
+            chartPredictedBalances.Series[0]["DrawingStyle"] = "Cylinder";
+            chartPredictedBalances.Series[0]["PointWidth"] = "0.6";
+            chartPredictedBalances.Series[0].SmartLabelStyle.Enabled = true;
+            chartPredictedBalances.Series[0].LabelAngle = 0;
+            chartPredictedBalances.Series[0].LabelBackColor = CustomColors.MediumGrey;
+
+            chartPredictedBalances.ChartAreas[0].AxisX.LabelStyle.Interval = 1;
+            chartPredictedBalances.ChartAreas[0].AxisY.LabelStyle.Format = "0 $";
+
+            chartPredictedBalances.ChartAreas[0].BackColor = CustomColors.LightGrey;
+            chartPredictedBalances.ChartAreas[0].BackSecondaryColor = Color.White;
+            chartPredictedBalances.ChartAreas[0].BackGradientStyle = GradientStyle.TopBottom;
+
+            chartPredictedBalances.Series[0].Font = new Font("Arial", (float)8, FontStyle.Regular);
+            chartPredictedBalances.Series[0]["MaxPixelPointWidth"] = "10";
+
+            chartPredictedBalances.Series[0].Points.Clear();
+        }
+
+        private static void AddEntryInPredictionChart(Chart chartPredictedBalances, DateTime startPredictionDate, DateTime endPredictionDate, double soldePredit, ref int entryNb)
+        {
+            int predictedBalance = (int)soldePredit;
+
+            chartPredictedBalances.Series[0].Points.AddXY(endPredictionDate.ToString("dd MMMM"), predictedBalance);
+            chartPredictedBalances.Series[0].Points[entryNb].Label = ClassTools.ConvertCurrencyToString(predictedBalance);
+            chartPredictedBalances.Series[0].Points[entryNb].LabelToolTip = ClassTools.ConvertCurrencyToString(predictedBalance);
+            entryNb++;
+            int curPoint = chartPredictedBalances.Series[0].Points.Count - 1;
+            if (predictedBalance >= 0)
+                chartPredictedBalances.Series[0].Points[curPoint].Color = Color.DarkGreen;
+            else
+                chartPredictedBalances.Series[0].Points[curPoint].Color = Color.DarkRed;
         }
 
         private static void AddSerie(Chart chart, int serieNb, Color labelColor, Color barColor)

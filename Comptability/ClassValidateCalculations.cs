@@ -177,7 +177,12 @@ namespace Comptability
                 if (timeInMonth == Util.LAST_DAY_OF_MONTH) // last day of month
                 {
                     if (startTime.Month + info.m_Period + 1 > 12)
+                    {
                         startTime = new DateTime(startTime.Year + 1, 1, 1).AddDays(-1);
+                        if (startTime.Date <= endTime.Date)
+                            nbMonthPeriods++;
+                        break;
+                    }
                     else
                         startTime = new DateTime(startTime.Year, startTime.Month + info.m_Period, 1).AddMonths(1).AddDays(-1);
                 }

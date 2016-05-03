@@ -120,7 +120,7 @@ namespace Compta
                     }
                 }
 
-                TDisplayInfo displayInfo = new TDisplayInfo(textToDisplay, m_lastDisplayedTransaction.m_ID, m_lastDisplayedTransaction.m_Type, m_lastDisplayedTransaction.m_AccountId);
+                TDisplayInfo displayInfo = new TDisplayInfo(textToDisplay, m_lastDisplayedTransaction.m_ID, m_lastDisplayedTransaction.m_OrderID, m_lastDisplayedTransaction.m_Type, m_lastDisplayedTransaction.m_AccountId);
                 if (m_inNewTransaction)
                 {
                     UIControls.TransactionListBox.Items.Add(displayInfo);
@@ -141,7 +141,7 @@ namespace Compta
             if (m_lastDisplayedTransaction != null)
             {
                 TransferFromStructureToForm(m_lastDisplayedTransaction);
-                UIControls.TransactionListBox.Items[transToSaveIndex] = new TDisplayInfo(TextFormatter.FormatTransactionText(m_lastDisplayedTransaction), m_lastDisplayedTransaction.m_ID, m_lastDisplayedTransaction.m_Type, m_lastDisplayedTransaction.m_AccountId);
+                UIControls.TransactionListBox.Items[transToSaveIndex] = new TDisplayInfo(TextFormatter.FormatTransactionText(m_lastDisplayedTransaction), m_lastDisplayedTransaction.m_ID, m_lastDisplayedTransaction.m_OrderID, m_lastDisplayedTransaction.m_Type, m_lastDisplayedTransaction.m_AccountId);
 
                 // Add transaction info in ToCome list if something is going on for the next month
                 if (m_lastDisplayedTransaction.m_Type == EType.e_Income || m_lastDisplayedTransaction.m_Type == EType.e_Expense || m_lastDisplayedTransaction.m_Type == EType.e_Pret)
@@ -276,7 +276,7 @@ namespace Compta
 
             if (textToDisplay != "")
             {
-                TDisplayInfo displayInfo = new TDisplayInfo(textToDisplay, info.m_ID, info.m_Type, info.m_AccountId);
+                TDisplayInfo displayInfo = new TDisplayInfo(textToDisplay, info.m_ID, info.m_OrderID, info.m_Type, info.m_AccountId);
                 if (listIndex == UIControls.TransactionListBox.Items.Count) // new transaction
                 {
                     UIControls.TransactionListBox.Items.Add(displayInfo);
@@ -421,6 +421,8 @@ namespace Compta
                 TDisplayInfo displayInfo = UIControls.TransactionListBox.Items[listIndex] as TDisplayInfo;
                 if (displayInfo != null)
                     info.m_ID = displayInfo.ID;
+
+                info.m_OrderID = listIndex;
             }
 
 			if (UIControls.RadioOneShotTrans != null && UIControls.RadioOneShotTrans.Checked )

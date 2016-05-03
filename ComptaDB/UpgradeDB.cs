@@ -29,6 +29,8 @@ namespace ComptaDB
 
                         if (majorVersion < 2)
                             UpgradeFrom1To2(MyTransaction, DBConnection);
+                        if (majorVersion < 3)
+                            UpgradeFrom2To3(MyTransaction, DBConnection);
                     }
                     else
                         UpgradeFrom1To2(MyTransaction, DBConnection);
@@ -54,67 +56,17 @@ namespace ComptaDB
             ClassDataAccess.ExecuteCommand("INSERT INTO VersionInfo VALUES (2, 0)", MyTransaction, DBConnection);
         }
 
-        /* public static void UpgradeFrom1_0To2_0()
+        public static void UpgradeFrom2To3(OleDbTransaction MyTransaction, OleDbConnection DBConnection)
         {
+            ClassDataAccess.ExecuteCommand("DELETE * FROM VersionInfo", MyTransaction, DBConnection);
+
             try
             {
-                ClassDataAccess.ExecuteQuery("ALTER TABLE AccountInfo ADD COLUMN MortgageBalance double");
+                ClassDataAccess.ExecuteCommand("ALTER TABLE TransactionInfo ADD COLUMN OrderID smallint", MyTransaction, DBConnection);
             }
             catch { }
-            try
-            {
-                ClassDataAccess.ExecuteQuery("ALTER TABLE TransactionInfo DROP COLUMN AmountPeriod");
-                ClassDataAccess.ExecuteQuery("ALTER TABLE TransactionInfo ADD COLUMN Category smallint"); 
-                ClassDataAccess.ExecuteQuery("ALTER TABLE TransactionInfo ADD COLUMN Type smallint");
-                ClassDataAccess.ExecuteQuery("ALTER TABLE TransactionInfo ADD COLUMN InterestRate double");
-                ClassDataAccess.ExecuteQuery("ALTER TABLE TransactionInfo ADD COLUMN PretPaiementType smallint");
-                ClassDataAccess.ExecuteQuery("ALTER TABLE TransactionInfo ADD COLUMN PretPaiement double");
-                ClassDataAccess.ExecuteQuery("ALTER TABLE TransactionInfo ADD COLUMN PretType smallint");
-                ClassDataAccess.ExecuteQuery("ALTER TABLE TransactionInfo ADD COLUMN RemoveFromAnnualReport smallint");
-                ClassDataAccess.ExecuteQuery("UPDATE TransactionInfo SET Type=0 WHERE IsRevenu=true");
-                ClassDataAccess.ExecuteQuery("UPDATE TransactionInfo SET Type=2 WHERE IsTransfer=true");
-                ClassDataAccess.ExecuteQuery("UPDATE TransactionInfo SET Type=1 WHERE IsTransfer=false AND IsRevenu=false");
-                ClassDataAccess.ExecuteQuery("ALTER TABLE TransactionInfo DROP COLUMN IsRevenu");
-                ClassDataAccess.ExecuteQuery("ALTER TABLE TransactionInfo DROP COLUMN IsTransfer");
-                ClassDataAccess.ExecuteQuery("CREATE TABLE Category (Id smallint, Name char(50))");
-                ClassDataAccess.ExecuteQuery("UPDATE TransactionInfo Set Category = 0, InterestRate = 0, PretPaiementType = 0, PretPaiement = 0, PretType = 0, RemoveFromAnnualReport = false");
-            }
-            catch {}
-            
-            OleDbConnection DBConnection;
-            if (ClassDataAccess.OpenDataSource(out DBConnection))
-            {
-                OleDbTransaction MyTransaction = DBConnection.BeginTransaction(System.Data.IsolationLevel.ReadCommitted);
-
-                try
-                {
-                    ClassDataAccess.ExecuteCommand("DELETE * FROM Category", MyTransaction, DBConnection);
-                    ClassDataAccess.ExecuteCommand("INSERT INTO Category VALUES ( " + 0 + ", 'Autres'" + " )", MyTransaction, DBConnection);
-                    ClassDataAccess.ExecuteCommand("INSERT INTO Category VALUES ( " + 1 + ", 'Economies'" + " )", MyTransaction, DBConnection);
-                    ClassDataAccess.ExecuteCommand("INSERT INTO Category VALUES ( " + 2 + ", 'Electricité/chauffage'" + " )", MyTransaction, DBConnection);
-                    ClassDataAccess.ExecuteCommand("INSERT INTO Category VALUES ( " + 3 + ", 'Enfants'" + " )", MyTransaction, DBConnection);
-                    ClassDataAccess.ExecuteCommand("INSERT INTO Category VALUES ( " + 4 + ", 'Epicerie'" + " )", MyTransaction, DBConnection);
-                    ClassDataAccess.ExecuteCommand("INSERT INTO Category VALUES ( " + 5 + ", 'Prêt/Hypothèque'" + " )", MyTransaction, DBConnection);
-                    ClassDataAccess.ExecuteCommand("INSERT INTO Category VALUES ( " + 6 + ", 'Loisirs'" + " )", MyTransaction, DBConnection);
-                    ClassDataAccess.ExecuteCommand("INSERT INTO Category VALUES ( " + 7 + ", 'Maison'" + " )", MyTransaction, DBConnection);
-                    ClassDataAccess.ExecuteCommand("INSERT INTO Category VALUES ( " + 8 + ", 'Salaire'" + " )", MyTransaction, DBConnection);
-                    ClassDataAccess.ExecuteCommand("INSERT INTO Category VALUES ( " + 9 + ", 'Subv. gouvernement'" + " )", MyTransaction, DBConnection);
-                    ClassDataAccess.ExecuteCommand("INSERT INTO Category VALUES ( " + 10 + ", 'Taxes/Assurances'" + " )", MyTransaction, DBConnection);
-                    ClassDataAccess.ExecuteCommand("INSERT INTO Category VALUES ( " + 11 + ", 'Télécomunications'" + " )", MyTransaction, DBConnection);
-                    ClassDataAccess.ExecuteCommand("INSERT INTO Category VALUES ( " + 12 + ", 'Voitures'" + " )", MyTransaction, DBConnection);
-                    ClassDataAccess.ExecuteCommand("INSERT INTO Category VALUES ( " + 13 + ", 'Epicerie'" + " )", MyTransaction, DBConnection);
-                    ClassDataAccess.ExecuteCommand("INSERT INTO Category VALUES ( " + 14 + ", 'Essence'" + " )", MyTransaction, DBConnection);
-
-                    MyTransaction.Commit();
-                    ClassDataAccess.CloseDataSource(DBConnection);
-                }
-                catch
-                {
-                    MyTransaction.Rollback();
-                    ClassDataAccess.CloseDataSource(DBConnection);
-                }
-            }
-        }*/
+            ClassDataAccess.ExecuteCommand("INSERT INTO VersionInfo VALUES (3, 0)", MyTransaction, DBConnection);
+        }
     }
 
 }

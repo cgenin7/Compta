@@ -18,7 +18,7 @@ namespace Compta
             return FormatDepenseText(info);
         }
 
-        public static string FormatToComeTransactionText(TTransactionInfo info, DateTime nextPaiementDate, int nbPaiements)
+        public static string FormatToComeTransactionText(TTransactionInfo info, DateTime nextPaiementDate)
         {
             string sToCome = info.m_TransactionName + ": ";
 
@@ -28,7 +28,7 @@ namespace Compta
                 sToCome += "dépense de ";
             if (info.m_Type == EType.e_Pret)
                 sToCome += "prêt de ";
-            sToCome += ClassTools.ConvertCurrencyToString(info.m_Balance) + (nbPaiements > 1 ? " d'ici au " : " le ") + ClassTools.ConvertDateToString(nextPaiementDate);
+            sToCome += ClassTools.ConvertCurrencyToString(info.m_Balance) + " le " + ClassTools.ConvertDateToString(nextPaiementDate);
             
             return sToCome;
         }
