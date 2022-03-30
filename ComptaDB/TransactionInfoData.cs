@@ -139,31 +139,38 @@ namespace ComptaDB
                             info.m_SecondTimeInMonth = (info.m_SecondTimeInMonth > 29 ? 29 : info.m_SecondTimeInMonth);
                             info.m_AmountAlreadyPayed = aReader.GetString(11);
                             info.m_Note = aReader.GetString(12);
-                            info.m_TransactionMode = (ETransactionMode)aReader.GetInt16(13);
+                            if (!aReader.IsDBNull(13))
+                                info.m_TransactionMode = (ETransactionMode)aReader.GetInt16(13);
                             // info.m_TransferAccountId = aReader.GetInt16(14);
                             // info.m_virementSoldeDuCompte = aReader.GetBoolean(15);
-                            info.m_nextVirementDate = aReader.GetDateTime(16);
-                            info.m_nextVirementAmount = aReader.GetDouble(17);
-                            info.m_Category = aReader.GetInt16(18);
-                            info.m_Type = (EType)aReader.GetInt16(19);
-                            info.m_PretInterestRate = aReader.GetDouble(20);
-                            info.m_PretPaiementType = (EPretPaiementType)aReader.GetInt16(21);
-                            if (info.m_PretPaiementType == EPretPaiementType.e_FixedPaiements)
-                                info.m_PretAmountPerPaiement = aReader.GetDouble(22);
-                            else
-                                info.m_PretAmortissementMonths = (int)aReader.GetDouble(22);
-                            info.m_PretType = (EPretType)aReader.GetInt16(23);
+                            if (!aReader.IsDBNull(16))
+                                info.m_nextVirementDate = aReader.GetDateTime(16);
+                            if (!aReader.IsDBNull(17))
+                                info.m_nextVirementAmount = aReader.GetDouble(17);
+                            if (!aReader.IsDBNull(18))
+                                info.m_Category = aReader.GetInt16(18);
+                            if (!aReader.IsDBNull(19))
+                                info.m_Type = (EType)aReader.GetInt16(19);
+                            if (!aReader.IsDBNull(20))
+                                info.m_PretInterestRate = aReader.GetDouble(20);
+                            if (!aReader.IsDBNull(21))
+                                info.m_PretPaiementType = (EPretPaiementType)aReader.GetInt16(21);
+
+                            if (!aReader.IsDBNull(22))
+                            {
+                                if (info.m_PretPaiementType == EPretPaiementType.e_FixedPaiements)
+                                    info.m_PretAmountPerPaiement = aReader.GetDouble(22);
+                                else
+                                    info.m_PretAmortissementMonths = (int)aReader.GetDouble(22);
+                            }
+                            if (!aReader.IsDBNull(23)) 
+                                info.m_PretType = (EPretType)aReader.GetInt16(23);
                             info.m_RemoveFromAnnualReport = (aReader.GetInt16(24) == 0 ? false : true);
-                            try
-                            {
+                            if (!aReader.IsDBNull(25))
                                 info.m_PretInterestsPaiedDay = aReader.GetInt16(25);
+                            if (!aReader.IsDBNull(26))
                                 info.m_OrderID = aReader.GetInt16(26);
-                            }
-                            catch
-                            {
-                                info.m_PretInterestsPaiedDay = 1;
-                                info.m_OrderID = 0;
-                            }
+
                             if (transactionToFind != null)
                             {
                                 if (transactionToFind.IsEqual(info))
