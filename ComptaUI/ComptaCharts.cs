@@ -118,45 +118,34 @@ namespace Compta
 
                 int entryNb = 0;
                 DateTime startPredictionDate = startDate;
+                DateTime endPredictionDate = startDate;
 
-                while (startDate.Date <= endDate.Date)
+                while (endPredictionDate.Date <= endDate.Date)
                 {
-                    DateTime endPredictionDate;
+                    double soldePredit = 0;
 
-                    if (period == EPeriodLength.e_PerDay)
-                        endPredictionDate = new DateTime(startDate.Year, startDate.Month, startDate.Day).AddDays(1);
-                    else if (period == EPeriodLength.e_PerWeek)
-                        endPredictionDate = new DateTime(startDate.Year, startDate.Month, startDate.Day).AddDays(7);
-                    else
-                        endPredictionDate = new DateTime(startDate.Year, startDate.Month, 1).AddMonths(1).AddDays(-1);
-
-                    if (endPredictionDate <= endDate.Date)
+                    if (main.CurrentAccountId == -1)
                     {
-                        double soldePredit = 0;
-
-                        if (main.CurrentAccountId == -1)
+                        foreach (TAccountInfo account in ClassAccounts.GetAccounts().AccountsInfo.Values)
                         {
-                            foreach (TAccountInfo account in ClassAccounts.GetAccounts().AccountsInfo.Values)
-                            {
-                                TPredictedBalance predictedBalanceInfo = new TPredictedBalance(account.AccountId, startPredictionDate, endPredictionDate);
-                                soldePredit += main.GetPredictedBalanceAtSpecificDate(account.Balance, ref predictedBalanceInfo);
-                            }
+                            TPredictedBalance predictedBalanceInfo = new TPredictedBalance(account.AccountId, startPredictionDate, endPredictionDate);
+                            soldePredit += main.GetPredictedBalanceAtSpecificDate(account.Balance, ref predictedBalanceInfo);
                         }
-                        else
-                        {
-                            DateTime predictionDate = new DateTime(startDate.Year, startDate.Month, 1).AddMonths(1).AddDays(-1);
-                            TPredictedBalance predictedBalanceInfo = new TPredictedBalance(main.CurrentAccountId, startPredictionDate, endPredictionDate);
-                            soldePredit = main.GetPredictedBalanceAtSpecificDate(soldeActuel, ref predictedBalanceInfo);
-                        }
-
-                        AddEntryInPredictionChart(chartPredictedBalances, startPredictionDate, endPredictionDate, soldePredit, ref entryNb);
                     }
-                    if (period == EPeriodLength.e_PerDay)
-                        startDate = startDate.AddDays(1);
-                    else if (period == EPeriodLength.e_PerWeek)
-                        startDate = startDate.AddDays(7);
                     else
-                        startDate = startDate.AddMonths(1);
+                    {
+                        DateTime predictionDate = new DateTime(endPredictionDate.Year, endPredictionDate.Month, 1).AddMonths(1).AddDays(-1);
+                        TPredictedBalance predictedBalanceInfo = new TPredictedBalance(main.CurrentAccountId, startPredictionDate, endPredictionDate);
+                        soldePredit = main.GetPredictedBalanceAtSpecificDate(soldeActuel, ref predictedBalanceInfo);
+                    }
+
+                    AddEntryInPredictionChart(chartPredictedBalances, startPredictionDate, endPredictionDate, soldePredit, ref entryNb);
+                    if (period == EPeriodLength.e_PerDay)
+                        endPredictionDate = new DateTime(endPredictionDate.Year, endPredictionDate.Month, endPredictionDate.Day).AddDays(1);
+                    else if (period == EPeriodLength.e_PerWeek)
+                        endPredictionDate = new DateTime(endPredictionDate.Year, endPredictionDate.Month, endPredictionDate.Day).AddDays(7);
+                    else
+                        endPredictionDate = new DateTime(endPredictionDate.Year, endPredictionDate.Month, 1).AddMonths(1).AddDays(-1);
                 }
             }
             catch (Exception ex)
