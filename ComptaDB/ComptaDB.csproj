@@ -45,6 +45,10 @@
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
     <TargetFrameworkProfile />
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>..\Install\</OutputPath>
@@ -171,7 +175,6 @@
     </Compile>
     <Compile Include="HistoryInfoData.cs" />
     <Compile Include="PaiementInfoData.cs" />
-    <Compile Include="PlacementInfoData.cs" />
     <Compile Include="TransactionInfoData.cs" />
     <Compile Include="UpgradeDB.cs" />
   </ItemGroup>

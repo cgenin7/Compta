@@ -144,10 +144,10 @@ namespace Compta
                 UIControls.TransactionListBox.Items[transToSaveIndex] = new TDisplayInfo(TextFormatter.FormatTransactionText(m_lastDisplayedTransaction), m_lastDisplayedTransaction.m_ID, m_lastDisplayedTransaction.m_OrderID, m_lastDisplayedTransaction.m_Type, m_lastDisplayedTransaction.m_AccountId);
 
                 // Add transaction info in ToCome list if something is going on for the next month
-                if (m_lastDisplayedTransaction.m_Type == EType.e_Income || m_lastDisplayedTransaction.m_Type == EType.e_Expense || m_lastDisplayedTransaction.m_Type == EType.e_Pret)
-                {
+                if (m_lastDisplayedTransaction.m_Type == EType.e_Expense)
                     m_main.AddToComeTransaction(m_lastDisplayedTransaction);
-                }
+                else
+                    m_main.AddToComeTransaction(m_lastDisplayedTransaction);
             }
             UIControls.TransactionListBox.Refresh();
         }
@@ -189,7 +189,7 @@ namespace Compta
                                 UIControls.ButtonCancelTransaction.Enabled = false;
                                 m_lastTransactionIndex = -1;
                             }
-                            m_main.DeleteToComeTransaction(info.ID);
+                            m_main.DeleteToComeTransaction(info);
                         }
                     }
                     m_lastTransactionIndex = -1;
@@ -285,10 +285,7 @@ namespace Compta
                     UIControls.TransactionListBox.Items[listIndex] = displayInfo;
             }
             // Add transaction info in ToCome list if something is going on for the next month
-            if (info.m_Type == EType.e_Income || info.m_Type == EType.e_Expense || info.m_Type == EType.e_Pret)
-            {
-                m_main.AddToComeTransaction(info);
-            }
+            m_main.AddToComeTransaction(info);
             return textToDisplay != "";
         }
 
@@ -329,8 +326,6 @@ namespace Compta
                         UIControls.ComboBoxFirstTimeInMonth.Visible = true;
                         UIControls.LabelFirstTimeInMonth.Location = m_originalLabelFirstTimeInMonthLocation;
                         UIControls.ComboBoxFirstTimeInMonth.Location = m_originalComboBoxFirstTimeInMonthLocation;
-                        UIControls.LabelFirstTimeInMonth.Visible = true;
-                        UIControls.ComboBoxFirstTimeInMonth.Visible = true;
                     }
                     else
                     {
@@ -373,12 +368,6 @@ namespace Compta
             {
                 UIControls.DataGridAmountAlreadyPayed.Visible = true;
                 UIControls.PanelBalanceAndButtons.Location = new Point(UIControls.PanelBalanceAndButtons.Location.X, m_originalPanelLocationY);
-            }
-            if (m_dataType == EType.e_Pret)
-            {
-                EPretType pretType = (EPretType)UIControls.ComboBoxPretType.SelectedIndex;
-                UIControls.ComboBoxInterestsPaiedDay.Visible = (pretType == EPretType.e_MortgageLinkedToAccount);
-                UIControls.LabelInterestsPaiedDay.Visible = (pretType == EPretType.e_MortgageLinkedToAccount);
             }
 		}
 
@@ -453,23 +442,6 @@ namespace Compta
             info.m_TransactionMode = UIControls.RadioButtonIsAutomatic.Checked ? ETransactionMode.e_Automatique : ETransactionMode.e_Manual;
             info.m_RemoveFromAnnualReport = UIControls.CheckBoxRemoveFromAnnualReport.Checked;
             
-            if (info.m_Type == EType.e_Pret)
-            {
-                info.m_PretType = (EPretType)UIControls.ComboBoxPretType.SelectedIndex;
-                info.m_PretInterestRate = Utils.ConvertToDouble(UIControls.TextBoxPretInterestRate.Text, true);
-                info.m_PretPaiementType = (EPretPaiementType)UIControls.ComboBoxPretPaiementType.SelectedIndex;
-                if (info.m_PretPaiementType == EPretPaiementType.e_FixedPaiements)
-                {
-                    info.m_PretAmountPerPaiement = Utils.ConvertToDouble(UIControls.TextBoxPretPaiementAmount.Text);
-                }
-                else
-                {
-                    info.m_PretAmortissementMonths = Utils.ConvertToInt(UIControls.TextBoxPretPaiementAmount.Text);
-                    if (info.m_PretPaiementType == EPretPaiementType.e_AmortissementYears)
-                        info.m_PretAmortissementMonths *= 12;
-                }
-                info.m_PretInterestsPaiedDay = Utils.GetDayFromComboText(UIControls.ComboBoxInterestsPaiedDay.Text);
-            }
             return info;
 		}
 
@@ -494,9 +466,7 @@ namespace Compta
             UIControls.TextBoxAmount.Text = info.m_Amount.ToString();
             UIControls.TextBoxAmount.Tag = UIControls.TextBoxAmount.Text;
             UIControls.TextBoxPeriod.Text = info.m_Period.ToString();
-            if (info.m_Type == EType.e_Pret && info.m_PretPaiementType != EPretPaiementType.e_FixedPaiements)
-                if (UIControls.ComboBoxPeriodLength.Items.Count < 5)
-                    UIControls.ComboBoxPeriodLength.Items.Add(Utils.ACCELERATED_PAIEMENTS);
+            
             if (UIControls.ComboBoxPeriodLength.Items.Count > (int)info.m_PeriodLength)
                 UIControls.ComboBoxPeriodLength.SelectedIndex = (int)info.m_PeriodLength;
 
@@ -544,26 +514,6 @@ namespace Compta
                 SaveTransaction(UIControls.TransactionListBox.SelectedIndex);
                 UIControls.TransactionListBox.Focus();
             }
-            
-            if (info.m_Type == EType.e_Pret)
-            {
-                UIControls.ComboBoxPretType.SelectedIndex = (int)info.m_PretType;
-                UIControls.TextBoxPretInterestRate.Text = ClassTools.ConvertDoubleToString(info.m_PretInterestRate);
-                UIControls.ComboBoxPretPaiementType.SelectedIndex = (int)info.m_PretPaiementType;
-                if (info.m_PretPaiementType == EPretPaiementType.e_FixedPaiements)
-                {
-                    UIControls.TextBoxPretPaiementAmount.Text = ClassTools.ConvertDoubleToString(info.m_PretAmountPerPaiement);
-                }
-                else
-                {
-                    int amortissement = info.m_PretAmortissementMonths;
-                    if (info.m_PretPaiementType == EPretPaiementType.e_AmortissementYears)
-                        amortissement /= 12;
-                    UIControls.TextBoxPretPaiementAmount.Text = amortissement.ToString();
-                }
-                if (info.m_PretInterestsPaiedDay >= 0)
-                    UIControls.ComboBoxInterestsPaiedDay.SelectedIndex = (info.m_PretInterestsPaiedDay > 0 ? info.m_PretInterestsPaiedDay - 1 : 0); 
-            }
 		}
 
         public void ChangeAllControlsVisibility(bool isVisible)
@@ -604,19 +554,6 @@ namespace Compta
             UIControls.ButtonDeleteTransaction.Visible = isVisible;
             UIControls.ButtonSaveTransaction.Visible = isVisible;
             UIControls.ButtonCancelTransaction.Visible = isVisible;
-            if (m_dataType == EType.e_Pret)
-            {
-                UIControls.ComboBoxPretType.Visible = isVisible;
-                UIControls.TextBoxPretInterestRate.Visible = isVisible;
-                UIControls.ComboBoxPretPaiementType.Visible = isVisible;
-                UIControls.TextBoxPretPaiementAmount.Visible = isVisible;
-                UIControls.LabelPretType.Visible = isVisible;
-                UIControls.LabelInterestRate.Visible = isVisible;
-                UIControls.LabelPercent.Visible = isVisible;
-                UIControls.LabelPaiementType.Visible = isVisible;
-                UIControls.LabelInterestsPaiedDay.Visible = isVisible;
-                UIControls.ComboBoxInterestsPaiedDay.Visible = isVisible;
-            }
         }
 
         public void InitializeAllFields()
@@ -658,18 +595,6 @@ namespace Compta
             UIControls.ComboBoxSecondTimeInMonth.Text = "15";
             UIControls.LabelBalance.Text = ""; 
             UIControls.LabelWarning.Text = "";
-
-            if (m_dataType == EType.e_Pret)
-            {
-                UIControls.ComboBoxPretType.SelectedIndex = 0;
-                UIControls.TextBoxPretInterestRate.Text = "0";
-                UIControls.ComboBoxPretPaiementType.SelectedIndex = 0;
-                UIControls.TextBoxPretPaiementAmount.Text = "0";
-                if (UIControls.ComboBoxPeriodLength.Items.Count < 5)
-                    UIControls.ComboBoxPeriodLength.Items.Add(Utils.ACCELERATED_PAIEMENTS);
-                UIControls.LabelInterestsPaiedDay.Visible = false;
-                UIControls.ComboBoxInterestsPaiedDay.Visible = false;
-            }
         }
 
         public void MakeFieldsVisible()
@@ -700,21 +625,6 @@ namespace Compta
             UIControls.ButtonSaveTransaction.Visible = true;
             UIControls.LabelBalance.Visible = true;
             UIControls.LabelWarning.Visible = true;
-
-            if (m_dataType == EType.e_Pret)
-            {
-                UIControls.LabelPeriod.Visible = true;
-                UIControls.ComboBoxPeriodLength.Visible = true;
-                UIControls.TextBoxPeriod.Visible = true;
-                UIControls.ComboBoxPretType.Visible = true;
-                UIControls.TextBoxPretInterestRate.Visible = true;
-                UIControls.ComboBoxPretPaiementType.Visible = true;
-                UIControls.TextBoxPretPaiementAmount.Visible = true;
-                UIControls.LabelPretType.Visible = true;
-                UIControls.LabelInterestRate.Visible = true;
-                UIControls.LabelPercent.Visible = true;
-                UIControls.LabelPaiementType.Visible = true;
-            }
         }
 
         private bool TransactionChanged(TTransactionInfo oldInfo)
@@ -737,17 +647,14 @@ namespace Compta
 
         private void SetMinAndMaxDates()
         {
-            if (m_dataType != EType.e_Pret)
+            UIControls.DateStart.MaxDate = new DateTime(2098, 12, 31);
+            UIControls.DateStart.MinDate = new DateTime(LocalSettings.BudgetYear, 1, 1);
+            UIControls.DateStart.MaxDate = new DateTime(LocalSettings.BudgetYear, 12, 31);
+            if (UIControls.DateEnd != null)
             {
-                UIControls.DateStart.MaxDate = new DateTime(2098, 12, 31);
-                UIControls.DateStart.MinDate = new DateTime(LocalSettings.BudgetYear, 1, 1);
-                UIControls.DateStart.MaxDate = new DateTime(LocalSettings.BudgetYear, 12, 31);
-                if (UIControls.DateEnd != null)
-                {
-                    UIControls.DateEnd.MaxDate = new DateTime(2098, 12, 31);
-                    UIControls.DateEnd.MinDate = new DateTime(LocalSettings.BudgetYear, 1, 1);
-                    UIControls.DateEnd.MaxDate = new DateTime(LocalSettings.BudgetYear, 12, 31);
-                }
+                UIControls.DateEnd.MaxDate = new DateTime(2098, 12, 31);
+                UIControls.DateEnd.MinDate = new DateTime(LocalSettings.BudgetYear, 1, 1);
+                UIControls.DateEnd.MaxDate = new DateTime(LocalSettings.BudgetYear, 12, 31);
             }
         }
 
@@ -806,7 +713,7 @@ namespace Compta
             {
                 UIControls.DataGridAmountAlreadyPayed.Rows.Add();
                 DataGridViewRow row = UIControls.DataGridAmountAlreadyPayed.Rows[i];
-                if (m_dataType == EType.e_Expense || m_dataType == EType.e_Pret)
+                if (m_dataType == EType.e_Expense)
                     row.Cells[0].Value = "Paiement effectué le " + ClassTools.ConvertDateToString(date) + ":";
                 else
                     row.Cells[0].Value = "Revenu déposé le " + ClassTools.ConvertDateToString(date) + ":";
@@ -834,8 +741,7 @@ namespace Compta
             while (++index < amounts.Length) // if next one is set as completed, or # 0, set this one as completed too
             {
                 string sNextAmount = amounts[index];
-                double nextAmount;
-                double.TryParse(sNextAmount.Replace("C", ""), out nextAmount);
+                double nextAmount = Utils.ConvertToDouble(sNextAmount.Replace("C", ""));
 
                 if (sNextAmount.StartsWith("C") || nextAmount != 0)
                 {

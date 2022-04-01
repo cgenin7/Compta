@@ -29,7 +29,6 @@ namespace Comptability
                         nbDaysInPeriod = info.m_Period;
                         break;
                     case EPeriodLength.e_PerWeek:
-                    case EPeriodLength.e_PerWeekAccelerated:
                         nbDaysInPeriod = info.m_Period * 7;
                         break;
                     case EPeriodLength.e_PerYear:
@@ -118,7 +117,7 @@ namespace Comptability
             {
                 if (info.m_PeriodLength == EPeriodLength.e_PerYear)
                     nextPaiementDate = nextPaiementDate.AddYears(info.m_Period);
-                else if (info.m_PeriodLength == EPeriodLength.e_PerWeek || info.m_PeriodLength == EPeriodLength.e_PerWeekAccelerated)
+                else if (info.m_PeriodLength == EPeriodLength.e_PerWeek)
                     nextPaiementDate = nextPaiementDate.AddDays(7 * info.m_Period);
                 else if (info.m_PeriodLength == EPeriodLength.e_PerDay)
                     nextPaiementDate = nextPaiementDate.AddDays(info.m_Period);

@@ -40,7 +40,6 @@ namespace ComptaDB
                             {
                                 info.m_TransferIncomes = aReader.GetDouble(5);
                                 info.m_TransferExpenses = aReader.GetDouble(6);
-                                info.m_MortgageBalance = aReader.GetDouble(7);
                                 info.m_PredictionDate = aReader.GetDateTime(10);
                             }
                             catch
@@ -88,7 +87,7 @@ namespace ComptaDB
                             try  // new fields, not present in old DB
                             {
                                 ClassDataAccess.ExecuteCommand(FormatHistoryStartCmd(historyInfo) + ", " + historyInfo.m_TransferIncomes.ToString(NumberFormatInfo.InvariantInfo) + ", " +
-                                    historyInfo.m_TransferExpenses.ToString(NumberFormatInfo.InvariantInfo) + ", " + historyInfo.m_MortgageBalance.ToString(NumberFormatInfo.InvariantInfo) + ", '" + historyInfo.m_PredictionDate.ToShortDateString() + "' )", MyTransaction, DBConnection);
+                                    historyInfo.m_TransferExpenses.ToString(NumberFormatInfo.InvariantInfo) + ", '" + historyInfo.m_PredictionDate.ToShortDateString() + "' )", MyTransaction, DBConnection);
                             }
                             catch
                             {
@@ -117,7 +116,7 @@ namespace ComptaDB
 
         private static string FormatHistoryStartCmd(THistoryInfo info)
         {
-            return "INSERT INTO HistoryInfo (HistoryDate, AccountId, Income, Expenses, AccountBalance, TransferIncome, TransferExpenses, MortgageBalance, PredictionDate) VALUES ( '" + info.m_HistoryDate.ToShortDateString() + "', " + info.m_AccountId +
+            return "INSERT INTO HistoryInfo (HistoryDate, AccountId, Income, Expenses, AccountBalance, TransferIncome, TransferExpenses, PredictionDate) VALUES ( '" + info.m_HistoryDate.ToShortDateString() + "', " + info.m_AccountId +
                                     ", " + info.m_Incomes.ToString(NumberFormatInfo.InvariantInfo) + ", " +
                                     info.m_Expenses.ToString(NumberFormatInfo.InvariantInfo) + ", " + info.m_AccountBalance.ToString(NumberFormatInfo.InvariantInfo);
         }

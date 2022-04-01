@@ -34,18 +34,6 @@ namespace Comptability
                         double totalAmountPaiedForTheYear = ClassAnnualCalculation.GetAnnualTransactionBalance(year, info);
                         info.m_TotalAmountPaiedForTheYear = totalAmountPaiedForTheYear;
             
-                        if (info.m_Type == EType.e_Pret)
-                        {
-                            if (info.m_PretType == EPretType.e_MortgageLinkedToAccount || info.m_PretType == EPretType.e_PretLinkedToAccount)
-                            {
-                                double interestNotYetPaied = 0;
-                                if (predictedBalance.EndPredictionDate.Date == new DateTime(LocalSettings.BudgetYear, 12, 31).Date)
-                                    interestNotYetPaied = ClassMortgage.GetInterestNotYetPaied(info);
-                                predictedBalance.TotalPretsRemaining += (info.m_PretRemainingAmount - interestNotYetPaied);
-                            }
-                            predictedBalance.TotalPrets += transactionBalance;
-                            predictedBalance.TotalPretsForTheYear += totalAmountPaiedForTheYear;
-                        }
                         balance += transactionBalance;
 
                         if (IsRevenu)
@@ -74,7 +62,8 @@ namespace Comptability
                     {
                         double amount = 0;
                         string sAmount = amounts[i];
-                        double.TryParse(sAmount.Replace("C", "").Replace("$", "").Trim(), out amount);
+                        amount = FormulaParser.ConvertToDouble(sAmount.Replace("C", "").Replace("$", "").Trim());
+
                         if (completed && !sAmount.StartsWith("C"))
                             amounts[i] = "C" + sAmount;
                         else if (sAmount.StartsWith("C") || amount != 0)
@@ -93,33 +82,29 @@ namespace Comptability
                         nbCompletedPaiements++;
                         sAmount = sAmount.Replace("C", "");
                     }
-                    if (double.TryParse(sAmount, out amount))
+                    amount = FormulaParser.ConvertToDouble(sAmount);
+                    if (bCompleted)
                     {
-                        if (bCompleted)
-                        {
-                            amountReallyPayed += amount;
-                            totalPayed += info.m_Amount;
-                        }
-                        else
-                            totalPayed += Math.Min(amount, info.m_Amount);
+                        amountReallyPayed += amount;
+                        totalPayed += info.m_Amount;
                     }
+                    else
+                        totalPayed += Math.Min(amount, info.m_Amount);
                 }
             }
             return totalPayed;
         }
 
-        public static double GetTransactionBalance(DateTime ActualDate, DateTime PredictionDate, ref TTransactionInfo info)
+        public static double GetTransactionBalance(DateTime ActualDate, DateTime PredictionDate, ref TTransactionInfo info, bool calculateManualTrans = true)
         {
             info.m_Warning = "";
             info.m_FirstPaiementDate = DateTime.MinValue;
             info.m_LastPaiementDate = DateTime.MinValue;
 
-            if (info.m_Type == EType.e_Pret)
-                info.m_Balance = ClassMortgage.CalculatePret(ActualDate, PredictionDate, ref info);
-            else if (info.m_eTransactionType == ETransactionType.e_OneShotTransaction)
+            if (info.m_eTransactionType == ETransactionType.e_OneShotTransaction)
                 info.m_Balance = GetOneShotTransactionBalance(ActualDate, PredictionDate, ref info);
             else
-                info.m_Balance = GetOtherTransactionsBalance(ActualDate, PredictionDate, ref info);
+                info.m_Balance = GetOtherTransactionsBalance(ActualDate, PredictionDate, ref info, calculateManualTrans);
             return info.m_Balance;
         }
 
@@ -154,7 +139,7 @@ namespace Comptability
             return 0;
         }
 
-        private static double GetOtherTransactionsBalance(DateTime ActualDate, DateTime PredictionDate, ref TTransactionInfo info)
+        private static double GetOtherTransactionsBalance(DateTime ActualDate, DateTime PredictionDate, ref TTransactionInfo info, bool calculateManualTrans)
         {
             int NbRemainingPaiements;
             double AmountRemainingInPeriod;
@@ -182,7 +167,10 @@ namespace Comptability
 
             if (info.m_TransactionMode == ETransactionMode.e_Automatique)
                 return AmountRemainingInPeriod;
-            return GetAmountForManualTransactions(TotalAmount, AmountRemainingInPeriod, TotalNbPaiements, info);
+
+            if (calculateManualTrans)
+                return GetAmountForManualTransactions(TotalAmount, AmountRemainingInPeriod, TotalNbPaiements, info);
+            return AmountRemainingInPeriod;
         }
 
         private static int GetNbPaiements(DateTime ActualDate, DateTime EndDate, ref TTransactionInfo info, bool AllPaiementsInPeriod)
@@ -298,7 +286,7 @@ namespace Comptability
 
         private static int GetNbDaysInPeriod(EPeriodLength PeriodLength)
         {
-            if (PeriodLength == EPeriodLength.e_PerWeek || PeriodLength == EPeriodLength.e_PerWeekAccelerated)
+            if (PeriodLength == EPeriodLength.e_PerWeek)
                 return 7;
             return 1;
         }
@@ -392,11 +380,7 @@ namespace Comptability
             if (amounts != null && amounts.Length > 0)
             {
                 string sAmount = amounts[amounts.Length - 1].Replace("C", "");
-                double amount;
-                if (double.TryParse(sAmount, out amount))
-                {
-                    return amount;
-                }
+                return FormulaParser.ConvertToDouble(sAmount);
             }
             return 0;
         }

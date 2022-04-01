@@ -6,6 +6,7 @@ using System.IO;
 using ComptaCommun;
 using ComptaDB;
 using Comptability;
+using System.Globalization;
 
 namespace Compta
 {
@@ -77,19 +78,18 @@ namespace Compta
             return day;
         }
 
-        public static double ConvertToDouble(String sValue, bool tryCultureVersions = false)
+        public static double ConvertToDouble(String sValue)
         {
             double result;
+
+            if (NumberFormatInfo.CurrentInfo.CurrencyDecimalSeparator == ".")
+                sValue = sValue.Replace(",", ".");
+            else
+                sValue = sValue.Replace(".", ",");
+
             if (double.TryParse(sValue, out result))
                 return result;
-            if (tryCultureVersions)
-            {
-                if (double.TryParse(sValue.Replace(".", ","), out result))
-                    return result;
-
-                if (double.TryParse(sValue.Replace(",", "."), out result))
-                    return result;
-            }
+            
             MessageBox.Show("La valeur entrée n'est pas valide.");
             return 0;
         }

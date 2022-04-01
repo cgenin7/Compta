@@ -118,163 +118,50 @@ namespace Compta
 
                 int entryNb = 0;
                 DateTime startPredictionDate = startDate;
-                DateTime endPredictionDate = startDate;
 
-                while (endPredictionDate.Date <= endDate.Date)
+                while (startDate.Date <= endDate.Date)
                 {
-                    double soldePredit = 0;
+                    DateTime endPredictionDate;
 
-                    if (main.CurrentAccountId == -1)
-                    {
-                        foreach (TAccountInfo account in ClassAccounts.GetAccounts().AccountsInfo.Values)
-                        {
-                            TPredictedBalance predictedBalanceInfo = new TPredictedBalance(account.AccountId, startPredictionDate, endPredictionDate);
-                            soldePredit += main.GetPredictedBalanceAtSpecificDate(account.Balance, ref predictedBalanceInfo);
-                        }
-                    }
-                    else
-                    {
-                        DateTime predictionDate = new DateTime(endPredictionDate.Year, endPredictionDate.Month, 1).AddMonths(1).AddDays(-1);
-                        TPredictedBalance predictedBalanceInfo = new TPredictedBalance(main.CurrentAccountId, startPredictionDate, endPredictionDate);
-                        soldePredit = main.GetPredictedBalanceAtSpecificDate(soldeActuel, ref predictedBalanceInfo);
-                    }
-
-                    AddEntryInPredictionChart(chartPredictedBalances, startPredictionDate, endPredictionDate, soldePredit, ref entryNb);
                     if (period == EPeriodLength.e_PerDay)
-                        endPredictionDate = new DateTime(endPredictionDate.Year, endPredictionDate.Month, endPredictionDate.Day).AddDays(1);
+                        endPredictionDate = new DateTime(startDate.Year, startDate.Month, startDate.Day).AddDays(1);
                     else if (period == EPeriodLength.e_PerWeek)
-                        endPredictionDate = new DateTime(endPredictionDate.Year, endPredictionDate.Month, endPredictionDate.Day).AddDays(7);
+                        endPredictionDate = new DateTime(startDate.Year, startDate.Month, startDate.Day).AddDays(7);
                     else
-                        endPredictionDate = new DateTime(endPredictionDate.Year, endPredictionDate.Month, 1).AddMonths(1).AddDays(-1);
+                        endPredictionDate = new DateTime(startDate.Year, startDate.Month, 1).AddMonths(1).AddDays(-1);
+
+                    if (endPredictionDate <= endDate.Date)
+                    {
+                        double soldePredit = 0;
+
+                        if (main.CurrentAccountId == -1)
+                        {
+                            foreach (TAccountInfo account in ClassAccounts.GetAccounts().AccountsInfo.Values)
+                            {
+                                TPredictedBalance predictedBalanceInfo = new TPredictedBalance(account.AccountId, startPredictionDate, endPredictionDate);
+                                soldePredit += main.GetPredictedBalanceAtSpecificDate(account.Balance, ref predictedBalanceInfo);
+                            }
+                        }
+                        else
+                        {
+                            DateTime predictionDate = new DateTime(startDate.Year, startDate.Month, 1).AddMonths(1).AddDays(-1);
+                            TPredictedBalance predictedBalanceInfo = new TPredictedBalance(main.CurrentAccountId, startPredictionDate, endPredictionDate);
+                            soldePredit = main.GetPredictedBalanceAtSpecificDate(soldeActuel, ref predictedBalanceInfo);
+                        }
+
+                        AddEntryInPredictionChart(chartPredictedBalances, startPredictionDate, endPredictionDate, soldePredit, ref entryNb);
+                    }
+                    if (period == EPeriodLength.e_PerDay)
+                        startDate = startDate.AddDays(1);
+                    else if (period == EPeriodLength.e_PerWeek)
+                        startDate = startDate.AddDays(7);
+                    else
+                        startDate = startDate.AddMonths(1);
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message + " (" + ex.StackTrace + ")", "Erreur");
-            }
-        }
-
-        public static void InitializeChartInvestissement(Chart chart, TTransactionInfo info, bool annualChart = false)
-        {
-            if (info != null)
-            {
-                try
-                {
-                    chart.Series.Clear();
-
-                    if (info.m_PretAmortissementList == null)
-                        chart.Visible = false;
-                    else
-                    {
-                        chart.Visible = true;
-
-                        TTransactionInfo newInfo = new TTransactionInfo(info);
-                        if (!annualChart)
-                        {
-                            newInfo.m_PretAmortissementList = new List<TPretAmortissement>();
-                            newInfo.m_PeriodLength = EPeriodLength.e_PerMonth;
-                            newInfo.m_Period = 1;
-                            newInfo.m_PretAmountPerPaiement = ClassMortgage.GetAmountPerMonth(info.m_PretAmountPerPaiement, info);
-                            ClassMortgage.CalculateFixPret(new DateTime(LocalSettings.BudgetYear, 1, 1), new DateTime(LocalSettings.BudgetYear, 12, 31), ref newInfo);
-                        }
-
-                        chart.AntiAliasing = AntiAliasingStyles.Text;
-
-                        if (annualChart)
-                        {
-                            AddSerie(chart, 0, Color.Black, Color.Gray);
-                            chart.Series[0].LabelToolTip += " - Solde";
-                            AddSerie(chart, 1, Color.Black, Color.Blue);
-                            chart.Series[1].LabelToolTip += " - Paiement";
-                            AddSerie(chart, 2, Color.Black, Color.DarkGreen);
-                            chart.Series[2].LabelToolTip += " - Capital";
-                            AddSerie(chart, 3, Color.Black, Color.DarkRed);
-                            chart.Series[3].LabelToolTip += " - Intérêts";
-                            
-                            chart.Series[0]["PixelPointWidth"] = "60";
-                            chart.Series[1]["PixelPointWidth"] = "60";
-                            chart.Series[2]["PixelPointWidth"] = "60";
-                            chart.Series[3]["PixelPointWidth"] = "60";
-                        }
-                        else
-                        {
-                            AddSerie(chart, 0, Color.Black, Color.Gray);
-                            chart.Series[0].LabelToolTip += " - Paiement";
-                            AddSerie(chart, 1, Color.Black, Color.DarkGreen);
-                            chart.Series[1].LabelToolTip += " - Capital";
-                            AddSerie(chart, 2, Color.Black, Color.DarkRed);
-                            chart.Series[2].LabelToolTip += " - Intérêts";
-
-                            chart.Series[0]["PixelPointWidth"] = "40";
-                            chart.Series[1]["PixelPointWidth"] = "40";
-                            chart.Series[2]["PixelPointWidth"] = "40";
-
-                        }
-
-                        chart.ChartAreas[0].BackColor = CustomColors.LightGrey;
-                        chart.ChartAreas[0].BackSecondaryColor = Color.White;
-                        chart.ChartAreas[0].AxisX.LabelStyle.Interval = 1;
-                        chart.ChartAreas[0].BackGradientStyle = GradientStyle.TopBottom;
-
-                        
-                        int nbEntries = 0;
-                        int lastYearEntered = newInfo.m_StartDate.Year;
-
-                        double capitalPaied = 0;
-                        double interestPaied = 0;
-                        foreach (TPretAmortissement pretAm in newInfo.m_PretAmortissementList)
-                        {
-                            capitalPaied += pretAm.CapitalPaied;
-                            interestPaied += pretAm.InterestPaied;
-
-                            if (annualChart)
-                            {
-                                if (pretAm.PaiementDate.Year > lastYearEntered)
-                                {
-                                    chart.Series[0].Points.AddXY(pretAm.PaiementDate.ToString("MM-yyyy"), (int)pretAm.RemainingAmount);
-                                    
-                                    double totalPaied = capitalPaied + interestPaied;
-                                    if (totalPaied > pretAm.RemainingAmount)
-                                    {
-                                        capitalPaied = capitalPaied * pretAm.RemainingAmount / totalPaied;
-                                        interestPaied = interestPaied * pretAm.RemainingAmount / totalPaied;
-                                        totalPaied = pretAm.RemainingAmount;
-                                    }
-                                    chart.Series[1].Points.AddXY(pretAm.PaiementDate.ToString("MM-yyyy"), (int)totalPaied);
-                                    chart.Series[2].Points.AddXY(pretAm.PaiementDate.ToString("MM-yyyy"), (int)capitalPaied);
-                                    chart.Series[3].Points.AddXY(pretAm.PaiementDate.ToString("MM-yyyy"), (int)interestPaied);
-                                    
-                                    lastYearEntered = pretAm.PaiementDate.Year;
-                                    capitalPaied = 0;
-                                    interestPaied = 0;
-                                    nbEntries++;
-                                }
-                            }
-                            else 
-                            {
-                                if (pretAm.PaiementDate.Year == LocalSettings.BudgetYear)
-                                {
-                                    chart.Series[0].Points.AddXY(pretAm.PaiementDate.ToString("MM-yyyy"), (int)capitalPaied + interestPaied);
-                                    chart.Series[0].Points[chart.Series[0].Points.Count - 1].LabelToolTip =  (int)(capitalPaied + interestPaied) + " $ - Paiement / " + (int)pretAm.RemainingAmount + " $ - Solde";
-                                    
-                                    chart.Series[1].Points.AddXY(pretAm.PaiementDate.ToString("MM-yyyy"), (int)capitalPaied);
-                                    chart.Series[2].Points.AddXY(pretAm.PaiementDate.ToString("MM-yyyy"), (int)interestPaied);
-                                    
-                                    nbEntries++;
-                                }
-                                capitalPaied = 0;
-                                interestPaied = 0;
-                            }
-                        }
-
-                        if (nbEntries >= 13)
-                            chart.Series[0].LabelAngle = -10;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message + " (" + ex.StackTrace + ")", "Erreur");
-                }
             }
         }
 

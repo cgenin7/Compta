@@ -46,17 +46,6 @@ namespace ComptaCommun
         }
     }
 
-    public class TPlacementInfo
-    {
-        public int m_ID;
-        public double m_Amount;
-        public DateTime m_Date;
-        public EPlacementType m_PlacementType;
-        public bool m_IsRendement;
-        public double m_PercentagePerYear;
-        public double m_InvestissementTotal;
-    }
-
     public class TDisplayInfo
     {
         public TDisplayInfo(string displayString, int id, int orderId, EType type, int accountId)
@@ -83,36 +72,19 @@ namespace ComptaCommun
     public enum EType
     {
         e_Income = 0,
-        e_Expense = 1,
-        e_Pret = 3,
-        e_Placement = 4
+        e_Expense = 1
     }
 
-    public enum EPretType
-    {
-        e_Pret = 0,
-        e_Mortgage = 1,
-        e_MortgageLinkedToAccount = 2,
-        e_PretLinkedToAccount = 3
-    }
-
-    public enum EPretPaiementType
-    {
-        e_AmortissementYears = 0,
-        e_AmortissementMonths = 1,
-        e_FixedPaiements = 2
-    }
-
+ 
     public class THistoryInfo
     {
         public DateTime m_HistoryDate;
         public DateTime m_PredictionDate = DateTime.MinValue;
         public int m_AccountId;
         public double m_Incomes;
-        public double m_TransferIncomes;
         public double m_Expenses;
+        public double m_TransferIncomes;
         public double m_TransferExpenses;
-        public double m_MortgageBalance;
         public double m_AccountBalance;
     }
 
@@ -128,19 +100,8 @@ namespace ComptaCommun
         e_PerDay,
         e_PerWeek,
         e_PerMonth,
-        e_PerYear,
-        e_PerWeekAccelerated
+        e_PerYear
     };
-
-    public enum EPlacementType
-    {
-        e_REER1,
-        e_REER2,
-        e_CELI1,
-        e_CELI2,
-        e_REEE,
-        e_Unknown
-    }
 
     public class TTransactionInfo
     {
@@ -179,14 +140,6 @@ namespace ComptaCommun
         public DateTime m_nextVirementDate = DateTime.MinValue;
         public double m_nextVirementAmount;
 
-        // Prêts / hypothèques
-        public double m_PretInterestRate;
-        public EPretPaiementType m_PretPaiementType;
-        public int m_PretAmortissementMonths;
-        public double m_PretAmountPerPaiement;
-        public EPretType m_PretType;
-        public int m_PretInterestsPaiedDay;
-
         // not saved in database
         public string m_Warning = "";
         public double m_Balance;
@@ -194,9 +147,7 @@ namespace ComptaCommun
         public DateTime m_LastPaiementDate;
         public int m_NbRemainingPaiements;
         public int m_TotalNbPaiements;
-        public double m_PretRemainingAmount;
-        public List<TPretAmortissement> m_PretAmortissementList;
-
+       
         public double m_TotalAmountPaiedForTheYear; // 
 
         public TTransactionInfo()
@@ -231,14 +182,6 @@ namespace ComptaCommun
             m_Warning = info.m_Warning;
             m_Category = info.m_Category;
             m_RemoveFromAnnualReport = info.m_RemoveFromAnnualReport;
-            
-            m_PretInterestRate = info.m_PretInterestRate;
-            m_PretPaiementType = info.m_PretPaiementType;
-            m_PretAmortissementMonths = info.m_PretAmortissementMonths;
-            m_PretAmountPerPaiement = info.m_PretAmountPerPaiement;
-            m_PretInterestsPaiedDay = info.m_PretInterestsPaiedDay;
-            m_PretType = info.m_PretType;
-            m_PretAmortissementList = info.m_PretAmortissementList;
         }
 
         public bool IsEqual(TTransactionInfo info)
@@ -246,8 +189,6 @@ namespace ComptaCommun
             if (info.m_Amount != m_Amount)
                 return false;
             if (info.m_TransactionMode != ETransactionMode.e_Automatique && info.m_AmountAlreadyPayed != m_AmountAlreadyPayed)
-                return false;
-            if (info.m_Type != EType.e_Pret && info.m_EndDate.Date != m_EndDate.Date)
                 return false;
             if (info.m_eTransactionType != m_eTransactionType)
                 return false;
@@ -273,24 +214,6 @@ namespace ComptaCommun
                 return false;
             if (info.m_RemoveFromAnnualReport != m_RemoveFromAnnualReport)
                 return false;
-            if (info.m_Type == EType.e_Pret)
-            {
-                if (info.m_PretInterestRate != m_PretInterestRate)
-                    return false;
-                if (info.m_PretPaiementType != m_PretPaiementType)
-                    return false;
-                if (info.m_PretPaiementType == EPretPaiementType.e_FixedPaiements)
-                {
-                    if (info.m_PretAmountPerPaiement != m_PretAmountPerPaiement)
-                        return false;
-                }
-                else if (info.m_PretAmortissementMonths != m_PretAmortissementMonths)
-                    return false;
-                if (info.m_PretType != m_PretType)
-                    return false;
-                if (info.m_PretInterestsPaiedDay != m_PretInterestsPaiedDay)
-                    return false;
-            }
             return true;
         }
     }

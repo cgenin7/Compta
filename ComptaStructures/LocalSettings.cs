@@ -101,9 +101,15 @@ namespace ComptaCommun
             }
         }
 
+        public static string DatabaseBackupPath
+        {
+            get { return ClassTools.GetConfigDir() + DatabaseName + "Backup.mdb"; }
+        }
+
         public static string DatabasePath 
         {
             get { return ClassTools.GetConfigDir() + DatabaseName + ".mdb"; }
+            set { DatabasePath = value; }
         }
 
         public static string PlacementsPath

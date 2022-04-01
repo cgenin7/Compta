@@ -45,8 +45,7 @@ namespace Compta
         
         private void textBoxCurrentBalance_TextChanged(object sender, EventArgs e)
         {
-            if (!double.TryParse(textBoxCurrentBalance.Text, out m_currentBalance))
-                m_currentBalance = 0;   
+            m_currentBalance = Utils.ConvertToDouble(textBoxCurrentBalance.Text);
         }
 
         private double m_currentBalance = 0;

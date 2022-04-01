@@ -13,8 +13,6 @@ namespace Compta
         {
             if (info.m_Type == EType.e_Income)
                 return FormatRevenuText(info);
-            if (info.m_Type == EType.e_Pret)
-                return FormatPretText(info);
             return FormatDepenseText(info);
         }
 
@@ -26,8 +24,6 @@ namespace Compta
                 sToCome += "revenu de ";
             if (info.m_Type == EType.e_Expense)
                 sToCome += "dépense de ";
-            if (info.m_Type == EType.e_Pret)
-                sToCome += "prêt de ";
             sToCome += ClassTools.ConvertCurrencyToString(info.m_Balance) + " le " + ClassTools.ConvertDateToString(nextPaiementDate);
             
             return sToCome;
@@ -47,9 +43,6 @@ namespace Compta
                     case EType.e_Expense: 
                         type = "Dépense '";
                         break;
-                    case EType.e_Pret:
-                        type = "Prêt '";
-                        break;
                 }
 				return (type + info.m_TransactionName + "' : " + info.m_Warning);
 			}
@@ -58,15 +51,13 @@ namespace Compta
 
 		public static string FormatHistorique( THistoryInfo info )
 		{
-            double balance = info.m_AccountBalance + info.m_Incomes + info.m_TransferIncomes - info.m_Expenses - info.m_TransferExpenses + info.m_MortgageBalance;
+            double balance = info.m_AccountBalance + info.m_Incomes + info.m_TransferIncomes - info.m_Expenses - info.m_TransferExpenses;
 
             string sHistorique = "Le " + ClassTools.ConvertDateToString(info.m_HistoryDate) + ", le solde prédit pour la fin de l'année était de " + ClassTools.ConvertCurrencyToString(balance) +
                     " (Solde: " + ClassTools.ConvertCurrencyToString(info.m_AccountBalance) + ", revenus: " + ClassTools.ConvertCurrencyToString(info.m_Incomes + info.m_TransferIncomes);
             
             sHistorique += ",dépenses: " + ClassTools.ConvertCurrencyToString(info.m_Expenses + info.m_TransferExpenses);
             
-            if (info.m_MortgageBalance >= 0.01)
-                sHistorique += ",solde des prêts/hypothèques: " + ClassTools.ConvertCurrencyToString(info.m_MortgageBalance);
             sHistorique += " )";
             return sHistorique;
 		}
@@ -85,23 +76,6 @@ namespace Compta
             return TransText;
         }
 
-        private static String FormatPretText(TTransactionInfo info)
-        {
-            String TransText = "";
-
-            if (info.m_Type == EType.e_Pret)
-            {
-                TransText += info.m_TransactionName + ": ";
-                if (info.m_PretType == EPretType.e_Mortgage || info.m_PretType == EPretType.e_MortgageLinkedToAccount)
-                    TransText += "hypothèque de ";
-                else
-                    TransText += "prêt de ";
-                TransText += ClassTools.ConvertCurrencyToString(info.m_Amount, false) + ". ";
-                TransText += "Paiement de " + ClassTools.ConvertCurrencyToString(info.m_PretAmountPerPaiement, false) + FormatPeriod(info) + ". ";
-                TransText += ClassTools.ConvertCurrencyToString(info.m_Balance, false) + GetBalanceText(info.m_Type, info.m_TransactionMode, new DateTime(LocalSettings.BudgetYear, 12, 31));
-            }
-            return TransText;
-        }
 
         private static String FormatDepenseText(TTransactionInfo info)
         {
@@ -117,21 +91,6 @@ namespace Compta
             return TransText;
         }
 
-        public static string FormatPlacementText(TPlacementInfo info)
-        {
-            string text = "";
-            if (!info.m_IsRendement)
-            {
-                text += "Placement de ";
-            }
-            else
-            {
-                text += "Rendement de ";
-            }
-            return text + ClassTools.ConvertCurrencyToString(info.m_Amount) + " le " + ClassTools.ConvertDateToString(info.m_Date) +
-                " (" + ClassTools.ConvertPlacementType(info.m_PlacementType) + ")";
-        }
-
         public static string GetBalanceText(EType dataType, ETransactionMode mode, DateTime endDate)
         {
             string sBalanceText = GetBalanceText(dataType, mode);
@@ -143,8 +102,6 @@ namespace Compta
         {
             if (dataType == EType.e_Income)
                 return " restant à recevoir ";
-            else if (dataType == EType.e_Pret)
-                return " restant à payer ";
             return " restant à dépenser ";
             
         }
@@ -162,33 +119,22 @@ namespace Compta
                 }
                 else
                 {
-                    double totalAmount = (info.m_Type == EType.e_Pret ? info.m_Amount : info.m_TotalNbPaiements * info.m_Amount);
-                    if (info.m_Type == EType.e_Pret)
+                    double totalAmount = info.m_TotalNbPaiements * info.m_Amount;
+                    if (totalAmount - info.m_TotalAmountPaiedForTheYear > 0.01)
                     {
-                        if (info.m_PretPaiementType != EPretPaiementType.e_FixedPaiements)
-                            sLabelBalance += " - Paiement de " + ClassTools.ConvertCurrencyToString(info.m_PretAmountPerPaiement, false) + FormatPeriod(info) + " sur un total de " + ClassTools.ConvertCurrencyToString(info.m_TotalAmountPaiedForTheYear, false);
-                        sLabelBalance += " -  Solde actuel: " + ClassTools.ConvertCurrencyToString(info.m_PretRemainingAmount, false);
-                        sLabelBalance += " - Echéance: " + ClassTools.ConvertDateToString(info.m_EndDate);
-                        sLabelBalance += " - Intérêt pour le mois: " + ClassTools.ConvertCurrencyToString((info.m_PretRemainingAmount * info.m_PretInterestRate / 1200), false);
-                    }
-                    else
-                    {
-                        if (totalAmount - info.m_TotalAmountPaiedForTheYear > 0.01)
+                    #if (DEBUG)
+                        if (!m_warningSent)
                         {
-                        #if (DEBUG)
-                            if (!m_warningSent)
-                            {
-                                System.Windows.Forms.MessageBox.Show("Erreur dans les calculs pour le solde annuel de la transaction " + info.m_TransactionName);
-                                m_warningSent = true;
-                            }
-                        #endif
+                            System.Windows.Forms.MessageBox.Show("Erreur dans les calculs pour le solde annuel de la transaction " + info.m_TransactionName);
+                            m_warningSent = true;
                         }
-                        sLabelBalance += "sur un total de " + ClassTools.ConvertCurrencyToString(totalAmount);
-                        if (info.m_FirstPaiementDate != DateTime.MinValue)
-                            sLabelBalance += " - Prochain paiement le " + ClassTools.ConvertDateToString(info.m_FirstPaiementDate);
-                        if (info.m_LastPaiementDate != DateTime.MinValue)
-                            sLabelBalance += " - Dernier paiement le " + ClassTools.ConvertDateToString(info.m_LastPaiementDate);
+                    #endif
                     }
+                    sLabelBalance += "sur un total de " + ClassTools.ConvertCurrencyToString(totalAmount);
+                    if (info.m_FirstPaiementDate != DateTime.MinValue)
+                        sLabelBalance += " - Prochain paiement le " + ClassTools.ConvertDateToString(info.m_FirstPaiementDate);
+                    if (info.m_LastPaiementDate != DateTime.MinValue)
+                        sLabelBalance += " - Dernier paiement le " + ClassTools.ConvertDateToString(info.m_LastPaiementDate);
                 }
             }
             else if (info.m_TransactionMode == ETransactionMode.e_Manual)
@@ -281,8 +227,7 @@ namespace Compta
 			{
 				case EPeriodLength.e_PerDay:
 					return "jours";
-                case EPeriodLength.e_PerWeekAccelerated:
-				case EPeriodLength.e_PerWeek:
+             	case EPeriodLength.e_PerWeek:
 					return "semaines";
 				case EPeriodLength.e_PerMonth:
 					return "mois";

@@ -28,12 +28,6 @@ namespace Comptability
 
         public static double CalculatePeriodicBalance(TTransactionInfo info, DateTime startPredictionDate, DateTime endTime)
         {
-            if (info.m_Type == EType.e_Pret)
-            {
-                TTransactionInfo copyInfo = new TTransactionInfo(info);
-                return ClassMortgage.CalculatePret(info.m_StartDate, endTime, ref copyInfo);
-            }
-
             int nbPeriods;
             if (info.m_TransactionMode == ETransactionMode.e_Automatique)
             {
@@ -72,7 +66,7 @@ namespace Comptability
 
             foreach (TTransactionInfo info in m_transactions.Values)
             {
-                if ((info.m_Type == EType.e_Expense || info.m_Type == EType.e_Pret) && info.m_AccountId == m_accountId)
+                if (info.m_Type == EType.e_Expense && info.m_AccountId == m_accountId)
                 {
                     double balance = CalculateTransactionBalance(info);
                     if (Math.Abs(balance - info.m_Balance) > 0.01)
@@ -87,9 +81,6 @@ namespace Comptability
         private double CalculateTransactionBalance(TTransactionInfo info)
         {
             DateTime endTime = info.m_EndDate.Date <= m_endPredictionDate.Date ? info.m_EndDate : m_endPredictionDate;
-
-            if (info.m_Type == EType.e_Pret)
-                endTime = m_endPredictionDate;
 
             switch (info.m_eTransactionType)
             { 
@@ -125,10 +116,8 @@ namespace Comptability
                     string[] amountPayedArray = sAmountAlreadyPayed.Split(';');
                     if (amountPayedArray.Length > 0)
                     {
-                        if (double.TryParse(amountPayedArray[0], out amountPayed))
-                        {
-                            return info.m_Amount - amountPayed;
-                        }
+                        amountPayed = FormulaParser.ConvertToDouble(amountPayedArray[0]);
+                        return info.m_Amount - amountPayed;
                     }
                 }
             }
@@ -222,7 +211,6 @@ namespace Comptability
                     }
                     return nb;
                 case EPeriodLength.e_PerWeek:
-                case EPeriodLength.e_PerWeekAccelerated:
                     nb = 0;
                     if (!fullPeriod)
                     {
@@ -271,8 +259,7 @@ namespace Comptability
                 {
                     if (i < nbPeriods)
                     {
-                        double amount = 0;
-                        double.TryParse(amounts[i].Replace("C", "").Replace("$", "").Trim(), out amount);
+                        double amount = FormulaParser.ConvertToDouble(amounts[i].Replace("C", "").Replace("$", "").Trim());
                         if (bSetComplete && !amounts[i].StartsWith("C"))
                             amounts[i] = "C" + amounts[i];
                         if (!bSetComplete && (amounts[i].StartsWith("C") || amount != 0))
@@ -281,8 +268,7 @@ namespace Comptability
                 }
                 for (int i = 0; i < amounts.Length && i < nbPeriods; i++)
                 {
-                    double amount = 0;
-                    double.TryParse(amounts[i].Replace("C", "").Replace("$", "").Trim(), out amount);
+                    double amount = FormulaParser.ConvertToDouble(amounts[i].Replace("C", "").Replace("$", "").Trim());
 
                     if (amounts[i].StartsWith("C"))
                         amountAlreadyPayed += info.m_Amount;

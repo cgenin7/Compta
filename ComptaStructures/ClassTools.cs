@@ -37,19 +37,12 @@ namespace ComptaCommun
 		{
 			if ( sValue == "" )
 				return false;
-			try
-			{
-				Convert.ToDouble( sValue );
-			}
-			catch ( InvalidCastException )
-			{
-				return false;
-			}
-			catch ( FormatException )
-			{
-				return false;
-			}
-			return true;
+            if (sValue.Trim() == "0")
+                return true;
+
+            double value = FormulaParser.ConvertToDouble( sValue );
+			
+			return value != 0;
 		}
 
 		public static string ConvertCurrencyToString( double Value, bool putCents = true )
@@ -85,42 +78,7 @@ namespace ComptaCommun
             return Result;
         }
 
-        public static EPlacementType ConvertPlacementType(string type)
-        {
-            switch (type)
-            {
-                case "REER 1":
-                    return EPlacementType.e_REER1;
-                case "REER 2":
-                    return EPlacementType.e_REER2;
-                case "CELI 1":
-                    return EPlacementType.e_CELI1;
-                case "CELI 2":
-                    return EPlacementType.e_CELI2;
-                case "REEE":
-                    return EPlacementType.e_REEE;
-            }
-            return EPlacementType.e_Unknown;
-        }
-
-        public static string ConvertPlacementType(EPlacementType type)
-        {
-            switch (type)
-            {
-                case EPlacementType.e_REER1:
-                    return "REER 1";
-                case EPlacementType.e_REER2:
-                    return "REER 2";
-                case EPlacementType.e_CELI1:
-                    return "CELI 1";
-                case EPlacementType.e_CELI2:
-                    return "CELI 2";
-                case EPlacementType.e_REEE:
-                    return "REEE";
-            }
-            return "Unknown";
-        }
-
+ 
         public static string GetCategory(int categoryId, List<TCategoryInfo> infos)
         {
             if (infos != null)

@@ -1,7 +1,5 @@
 using System;
 using System.Data.OleDb;
-using System.Globalization;
-using System.Collections.Generic;
 using ComptaCommun;
 
 namespace ComptaDB
@@ -13,7 +11,7 @@ namespace ComptaDB
             OleDbConnection DBConnection;
             string Note = "";
 
-            if (ClassDataAccess.OpenComptaDataSource(out DBConnection))
+            if (OpenComptaDataSource(out DBConnection))
             {
                 //create the command object and store the sql query
                 OleDbCommand aCommand = new OleDbCommand("SELECT * FROM Notes", DBConnection);
@@ -38,10 +36,10 @@ namespace ComptaDB
                 }
                 catch (OleDbException)
                 {
-                    ClassDataAccess.CloseDataSource(DBConnection);
+                    CloseDataSource(DBConnection);
                     return "";
                 }
-                ClassDataAccess.CloseDataSource(DBConnection);
+                CloseDataSource(DBConnection);
                 return Note;
             }
             return "";
@@ -49,8 +47,9 @@ namespace ComptaDB
 
         internal static bool OpenComptaDataSource(out OleDbConnection DBConnection)
         {
+            string connectionString = "Provider= Microsoft.ACE.OLEDB.12.0;Data Source=" + LocalSettings.DatabasePath;
             //create the database connection
-            DBConnection = new OleDbConnection("Provider= Microsoft.ACE.OLEDB.12.0;Data Source=" + LocalSettings.DatabasePath);
+            DBConnection = new OleDbConnection(connectionString);
             try
             {
                 DBConnection.Open();
@@ -70,7 +69,7 @@ namespace ComptaDB
             {
                 DBConnection.Open();
             }
-            catch (OleDbException ex)
+            catch 
             {
                 return false;
             }
@@ -100,7 +99,7 @@ namespace ComptaDB
         {
             OleDbConnection DBConnection;
 
-            if (ClassDataAccess.OpenComptaDataSource(out DBConnection))
+            if (OpenComptaDataSource(out DBConnection))
             {
                 try
                 {
@@ -108,11 +107,11 @@ namespace ComptaDB
 
                     MyCommand.ExecuteNonQuery();
 
-                    ClassDataAccess.CloseDataSource(DBConnection);
+                    CloseDataSource(DBConnection);
                 }
                 catch (Exception ex)
                 {
-                    ClassDataAccess.CloseDataSource(DBConnection);
+                    CloseDataSource(DBConnection);
                     throw ex;
                 }
             }

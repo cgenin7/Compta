@@ -3,17 +3,10 @@ using System.Collections.Generic;
 using System.Text;
 using System.Drawing;
 using System.Collections;
-using System.ComponentModel;
 using System.Windows.Forms;
-using System.Data;
-using System.Globalization;
 using Comptability;
 using ComptaCommun;
 using ComptaDB;
-using System.Reflection;
-using System.IO;
-using System.Windows.Forms.DataVisualization.Charting;
-using Compta.CustomControls;
 
 namespace Compta
 {
@@ -24,7 +17,6 @@ namespace Compta
         private int m_currentAccountId = -1;
         private DisplayData m_incomesDisplayData;
         private DisplayData m_expensesDisplayData;
-        private DisplayData m_pretsDisplayData;
         
         #endregion
 
@@ -43,14 +35,22 @@ namespace Compta
 
         public void AddToComeTransaction(TTransactionInfo info)
         {
+            if (info.m_Type == EType.e_Expense)
+                AddToComeTransaction(info, listBoxToComeExpense);
+            else
+                AddToComeTransaction(info, listBoxToComeIncome);
+        }
+
+        private void AddToComeTransaction(TTransactionInfo info, ListBoxSortedByDate listBoxToCome)
+        {
             string sAccountName = (m_currentAccountId == -1 ? ClassAccounts.GetAccounts().GetAccountNameFromId(info.m_AccountId) + " - " : "");
 
-            listBoxToCome0.Sorted = false;
+            listBoxToCome.Sorted = false;
             TTransactionInfo copyInfo = new TTransactionInfo(info);
             DateTime inOneMonthTime = DateTime.Now.AddMonths(1);
             DateTime lastDayOfMonthTime = new DateTime(inOneMonthTime.Year, inOneMonthTime.Month, 1).AddDays(-1);
             bool bAdded = false;
-            int itemInListIndex = GetListIndexFromId(listBoxToCome0, copyInfo.m_ID);
+            int itemInListIndex = GetListIndexFromId(listBoxToCome, copyInfo.m_ID);
 
             DateTime nextPaiementDate = copyInfo.m_FirstPaiementDate.Date;
             if (copyInfo.m_eTransactionType == ETransactionType.e_OneShotTransaction)
@@ -59,8 +59,8 @@ namespace Compta
             string sToCome = "";
             if (!string.IsNullOrEmpty(info.m_Warning) && !info.m_Warning.StartsWith(ClassTransactions.GOOD_NEWS))
             {
-                sToCome = sAccountName + info.m_TransactionName + ": double-cliquer pour vérifier l'avertissement.";
-                AddItemToCome(itemInListIndex, sToCome, copyInfo, nextPaiementDate);
+                sToCome = sAccountName + info.m_TransactionName + ": " + info.m_Warning;
+                AddItemToCome(listBoxToCome, itemInListIndex, sToCome, copyInfo, nextPaiementDate);
             }
             else
             {
@@ -68,7 +68,7 @@ namespace Compta
                 copyInfo.m_Balance = 0;
                 while (nextPaiementDate.Date <= lastDayOfMonthTime.Date)
                 {
-                    ClassCalculation.GetTransactionBalance(startDate, nextPaiementDate, ref copyInfo);
+                    ClassCalculation.GetTransactionBalance(startDate, nextPaiementDate, ref copyInfo, false);
                     if (copyInfo.m_Balance <= 0.01)
                         break;
                     
@@ -78,32 +78,40 @@ namespace Compta
                     DateTime oldNextPaimentDate = nextPaiementDate;
                     nextPaiementDate = Util.GetNextPaiementDate(copyInfo, nextPaiementDate);
 
-                    AddItemToCome(itemInListIndex, sToCome, copyInfo, nextPaiementDate);
+                    AddItemToCome(listBoxToCome, itemInListIndex, sToCome, copyInfo, nextPaiementDate);
                     if (oldNextPaimentDate.Date == nextPaiementDate.Date)
                         break;
                 }
             }
             if (!bAdded && itemInListIndex >= 0)
-                listBoxToCome0.Items.RemoveAt(itemInListIndex);
-            listBoxToCome0.Sorted = true;
+                listBoxToCome.Items.RemoveAt(itemInListIndex);
+            listBoxToCome.Sorted = true;
         }
 
-        public void AddItemToCome(int itemInListIndex, string sToCome, TTransactionInfo copyInfo, DateTime nextPaiementDate)
+        public void AddItemToCome(ListBoxSortedByDate listBoxToCome, int itemInListIndex, string sToCome, TTransactionInfo copyInfo, DateTime nextPaiementDate)
         {
             TDisplayInfo displayInfo = new TDisplayInfo(sToCome, copyInfo.m_ID, copyInfo.m_OrderID, copyInfo.m_Type, copyInfo.m_AccountId);
 
             displayInfo.Date = nextPaiementDate;
             if (itemInListIndex >= 0)
-                listBoxToCome0.Items[itemInListIndex] = displayInfo;
+                listBoxToCome.Items[itemInListIndex] = displayInfo;
             else
-                listBoxToCome0.Items.Add(displayInfo);
+                listBoxToCome.Items.Add(displayInfo);
         }
 
-        public void DeleteToComeTransaction(int ID)
+        public void DeleteToComeTransaction(TDisplayInfo info)
         {
-            int itemInListIndex = GetListIndexFromId(listBoxToCome0, ID);
+            if (info.DataType == EType.e_Expense)
+                DeleteToComeTransaction(info.ID, listBoxToComeExpense);
+            else
+                DeleteToComeTransaction(info.ID, listBoxToComeIncome);
+        }
+
+        private void DeleteToComeTransaction(int ID, ListBoxSortedByDate listBoxToCome)
+        {
+            int itemInListIndex = GetListIndexFromId(listBoxToCome, ID);
             if (itemInListIndex >= 0)
-                listBoxToCome0.Items.RemoveAt(itemInListIndex);
+                listBoxToCome.Items.RemoveAt(itemInListIndex);
         }
 
         #region Private Methods
@@ -114,30 +122,12 @@ namespace Compta
             labelPredictedBalance0.ForeColor = Color.DarkGreen;
             chartAnnuals.Visible = false;
             chartPredictedBalances.Visible = false;
-            chartAmortissement.Visible = false;
-            listBoxToCome0.Items.Clear();
+            listBoxToComeExpense.Items.Clear();
+            listBoxToComeIncome.Items.Clear();
             TextBoxNotes0.Text = "";
-            ClearPlacementsInfo();
             ListBoxRevenus1.Items.Clear(); 
             ListBoxDepenses2.Items.Clear();
-            listBoxPrets4.Items.Clear();
             ListBoxHistorique5.Items.Clear();
-        }
-
-        private void ClearPlacementsInfo()
-        {
-            listBoxPlacements.Items.Clear();
-            listBoxRendements.Items.Clear();
-
-            m_mostRecentRendementDates.Clear();
-            m_totalPlacements = 0;
-            m_totalRendements.Clear();
-            labelInvestissementTotal.Text = "Investissement total: 0 $";
-            labelRendementTotal.Text = "Rendement total: 0 $";
-            labelValeurPlacements.Text = "0 $";
-            labelValeurPlacements.ForeColor = Color.DarkGreen;
-            labelProfitPlacements.Text = "0 $";
-            labelProfitPlacements.ForeColor = Color.DarkGreen;
         }
 
         private void LoadInfoFromDatabase(bool reinitializeAllTransactions = false, bool isFirstTime = false)
@@ -159,7 +149,6 @@ namespace Compta
 
                 Utils.FillComboCategories(comboBoxCategory1);
                 Utils.FillComboCategories(comboBoxCategory2);
-                Utils.FillComboCategories(comboBoxCategory4);
                 
                 Dictionary<int, TAccountInfo> accountsInfo = ClassAccounts.GetAccounts().AccountsInfo;
 
@@ -224,9 +213,6 @@ namespace Compta
                     {
                         MessageBox.Show(exception.Message, "Erreur", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
-
-                    ClassPlacements.GetPlacements().LoadPlacementsFromDataStorage();
-                    AddPlacementsInList();
 
                     InitializeAccount();
                 }
@@ -294,7 +280,6 @@ namespace Compta
             tabPageSolde.Text = "Solde";
 
             m_currentAccountId = accountInfo.AccountId;
-            chartAmortissement.Visible = false;
 
             buttonNewRevenu1.Enabled = true;
             buttonNewDepense2.Enabled = true;
@@ -312,11 +297,9 @@ namespace Compta
 
             m_incomesDisplayData.InitializeAll();
             m_expensesDisplayData.InitializeAll();
-            m_pretsDisplayData.InitializeAll();
             m_incomesDisplayData.SetDefaultSelectedIndex();
             m_expensesDisplayData.SetDefaultSelectedIndex();
-            m_pretsDisplayData.SetDefaultSelectedIndex();
-
+            
             ChangeTitles();
         }
 
@@ -330,7 +313,6 @@ namespace Compta
             {
                 case TAB_SUMMARY:
                     tabControlMain.TabPages.Add(m_tabPageSolde);
-                    tabControlMain.TabPages.Add(m_tabPagePlacements);
                     m_currentAccountId = -1;
                     InitializeAccount();
                     break;
@@ -339,7 +321,6 @@ namespace Compta
                     tabControlMain.TabPages.Add(m_tabPageSolde);
                     tabControlMain.TabPages.Add(m_tabPageIncomes);
                     tabControlMain.TabPages.Add(m_tabPageExpenses);
-                    tabControlMain.TabPages.Add(m_tabPagePrets);
                     tabControlMain.TabPages.Add(m_tabPageHistorique);
                     InitializeAccount();
                     break;
@@ -375,11 +356,9 @@ namespace Compta
         {
             try
             {
-                FillUpGeneralInfo();
-
-                FillUpListBoxes();
-
                 FillUpPredictedBalances();
+                FillUpGeneralInfo();
+                FillUpListBoxes();
             }
             catch (Exception ex)
             {
@@ -389,8 +368,8 @@ namespace Compta
 
         public void UpdateBalances()
         {
-            FillUpGeneralInfo();
             FillUpPredictedBalances();
+            FillUpGeneralInfo();
         }
 
         private void FillUpSummaryInfo()
@@ -436,24 +415,24 @@ namespace Compta
             if (predictedBalance.TotalPretsForTheYear > 0)
                 labelTotalExpenses.Text += " + " + ClassTools.ConvertCurrencyToString((int)predictedBalance.TotalPretsForTheYear) + " pour les prêts/hypothèques";
             labelTotalExpenses.Text += ". " + ClassTools.ConvertCurrencyToString((int)predictedBalance.Expenses) + " restant à dépenser d'ici le " + ClassTools.ConvertDateToString(CurrentEndPredictionDate) + ".";
-            labelPretTotal.Text = "Montant à payer annuellement: " + ClassTools.ConvertCurrencyToString((int)predictedBalance.TotalPretsForTheYear) + ". " +
-                ClassTools.ConvertCurrencyToString((int)predictedBalance.TotalPrets) + " restant à dépenser d'ici le " + ClassTools.ConvertDateToString(CurrentEndPredictionDate) + ".";
-
+    
             labelPredictedBalance0.Text = ClassTools.ConvertCurrencyToString(soldePredit);
             labelPredictedBalance0.ForeColor = soldePredit >= 0 ? Color.DarkGreen : Color.DarkRed;
             ListBoxHistorique5.Items.Clear();
             
             AddHistorique();
 
-            listBoxToCome0.Select();
-            
+            listBoxToComeExpense.Select();
+            listBoxToComeIncome.Select();
+
             ListBoxHistorique5.Select();
         }
 
         // Add transaction info in ToCome list if something is going on for the next month
         private void FillUpToComeForAllAccounts()
         {
-            listBoxToCome0.Items.Clear();
+            listBoxToComeExpense.Items.Clear();
+            listBoxToComeIncome.Items.Clear();
 
             Dictionary<int, TTransactionInfo> transactions = ClassTransactions.GetTransactions().Transactions;
 
@@ -463,10 +442,8 @@ namespace Compta
                 {
                     TTransactionInfo info = transactions[transID];
                     if (info != null)
-                    {
-                        if (info.m_Type == EType.e_Income || info.m_Type == EType.e_Expense || info.m_Type == EType.e_Pret)
-                            AddToComeTransaction(info);
-                    }
+                        AddToComeTransaction(info);
+                    
                 }
             }
 
@@ -474,10 +451,10 @@ namespace Compta
 
         private void FillUpListBoxes()
         {
-            listBoxToCome0.Items.Clear();
+            listBoxToComeExpense.Items.Clear();
+            listBoxToComeIncome.Items.Clear();
             ListBoxRevenus1.Items.Clear();
             ListBoxDepenses2.Items.Clear();
-            listBoxPrets4.Items.Clear();
             
             Dictionary<int, TTransactionInfo> transactions = ClassTransactions.GetTransactions().Transactions;
             
@@ -494,8 +471,6 @@ namespace Compta
                                 m_incomesDisplayData.AddTransactionInList(info);
                             else if (info.m_Type == EType.e_Expense)
                                 m_expensesDisplayData.AddTransactionInList(info);
-                            else if (info.m_Type == EType.e_Pret)
-                                m_pretsDisplayData.AddTransactionInList(info);
                         }
                     }
                 }
@@ -505,11 +480,8 @@ namespace Compta
                 m_incomesDisplayData.ChangeAllControlsVisibility(false);
             if (ListBoxDepenses2.Items.Count <= 0)
                 m_expensesDisplayData.ChangeAllControlsVisibility(false);
-            if (listBoxPrets4.Items.Count <= 0)
-                m_pretsDisplayData.ChangeAllControlsVisibility(false);
             ListBoxRevenus1.Select();
             ListBoxDepenses2.Select();
-            listBoxPrets4.Select();
         }
 
         private void DrawListBoxLine(object sender, DrawItemEventArgs e, Color color, FontStyle fontStyle)
@@ -659,94 +631,7 @@ namespace Compta
             ComptaCharts.InitializeChartPredictedBalances(this, chartPredictedBalances, startDate, lastDayOfMonth, soldeActuel, EPeriodLength.e_PerDay);
         }
         
-        private void AddPlacementsInList()
-        {
-            ClearPlacementsInfo();
-            SortedList placements = ClassPlacements.GetPlacements().Placements;
-            int i = 0;
-
-            if (placements != null)
-            {
-                foreach (TPlacementInfo info in placements.Values)
-                {
-                    i++;
-                    if (info != null)
-                    {
-                        AddPlacementInList(info);
-                    }
-                }
-            }
-        }
-
-        private bool AddPlacementInList(TPlacementInfo info)
-        {
-            string textToDisplay = TextFormatter.FormatPlacementText(info);
-            double percentage;
-            TDisplayInfo displayInfo = new TDisplayInfo(textToDisplay, info.m_ID, 0, EType.e_Placement, -1);        
-
-            if (textToDisplay != "")
-            {
-                if (!info.m_IsRendement)
-                {
-                    listBoxPlacements.Items.Add(displayInfo);
-                    m_totalPlacements += info.m_Amount;
-                    labelInvestissementTotal.Text = "Investissement total: " + ClassTools.ConvertCurrencyToString(m_totalPlacements);
-                }
-                else
-                {
-                    double percentagePerYear;
-                    double profit = ClassPlacements.GetPlacements().CalculateProfit(ref info, out percentage, out percentagePerYear);
-                    displayInfo.DisplayString += ". Profit: " + ClassTools.ConvertCurrencyToString(profit) + " (" + percentage.ToString("F2") + "% / " + percentagePerYear.ToString("F2") + " % par année)";
-                    listBoxRendements.Items.Add(displayInfo);
-                    
-                    DateTime mostRecentRendementDate = (m_mostRecentRendementDates.ContainsKey(info.m_PlacementType) ? m_mostRecentRendementDates[info.m_PlacementType].Date : DateTime.MinValue);
-                    // Calculate total rendement on most recent date only
-                    if (mostRecentRendementDate == info.m_Date.Date)
-                    {
-                        if (!m_totalRendements.ContainsKey(info.m_PlacementType))
-                            m_totalRendements[info.m_PlacementType] = info.m_Amount;
-                        else
-                            m_totalRendements[info.m_PlacementType] += info.m_Amount;
-                    }
-                    if (info.m_Date.Date > mostRecentRendementDate.Date)
-                    {
-                        m_mostRecentRendementDates[info.m_PlacementType] = info.m_Date.Date;
-                        m_totalRendements[info.m_PlacementType] = info.m_Amount;
-                    }
-                }
-            }
-
-            double totalRendement = GetTotalRendement();
-            labelRendementTotal.Text = "Rendement total: " + ClassTools.ConvertCurrencyToString(totalRendement);
-            m_totalPercentPerYear = ClassPlacements.GetPlacements().CalculateTotalPercentPerYear(m_totalPlacements, totalRendement);
-            if (totalRendement >= 0)
-                labelValeurPlacements.ForeColor = Color.DarkGreen;
-            else
-                labelValeurPlacements.ForeColor = Color.DarkRed; //FromArgb(201, 44, 55);
-            labelValeurPlacements.Text = ClassTools.ConvertCurrencyToString(totalRendement);
-            
-            if (m_totalPlacements == 0)
-                percentage = 0;
-            else
-                percentage = (100*totalRendement/m_totalPlacements) - 100;
-            if (totalRendement - m_totalPlacements >= 0)
-                labelProfitPlacements.ForeColor = Color.DarkGreen;
-            else
-                labelProfitPlacements.ForeColor = Color.DarkRed; //FromArgb(201, 44, 55);
-            string strProfits = ClassTools.ConvertCurrencyToString(totalRendement - m_totalPlacements);
-            string strProfits2 = " (" + percentage.ToString("F2") + "% / " + m_totalPercentPerYear.ToString("F2") + "% par année)";
-            labelProfitPlacements.Text = strProfits + strProfits2;
-            return displayInfo.DisplayString != "";
-        }
-
-        private double GetTotalRendement()
-        {
-            double total = 0;
-            foreach (double rendement in m_totalRendements.Values)
-                total += rendement;
-            return total;
-        }
-
+      
         private void AddHistorique()
         {
             // Historique
@@ -860,7 +745,6 @@ namespace Compta
             historyInfo.m_Expenses = info.ExpensesAtPredictionDate - info.TransferExpenses;
             historyInfo.m_TransferExpenses = info.TransferExpenses;
             historyInfo.m_AccountBalance = info.Balance;
-            historyInfo.m_MortgageBalance = info.MortgageBalance;
         }
 
         private void SoldeActuelChanged()
@@ -895,40 +779,6 @@ namespace Compta
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message + " (" + ex.StackTrace + ")", "Erreur");
-            }
-        }
-
-        private void AddPlacement(string amount, DateTime date, EPlacementType type)
-        {
-            AddPlacement(amount, date, type, false);
-        }
-
-        private void AddPlacement(string amount, DateTime date, EPlacementType type, bool isRendement)
-        {
-            Exception exception;
-            TPlacementInfo info = new TPlacementInfo();
-
-            if (double.TryParse(amount, out info.m_Amount))
-            {
-                info.m_Date = date;
-                info.m_PlacementType = type;
-                info.m_IsRendement = isRendement;
-
-                SortedList placements = ClassPlacements.GetPlacements().Placements;
-
-                ClassPlacements.GetPlacements().SavePlacementInDataStorage(info, out exception);
-                if (exception != null)
-                {
-                    MessageBox.Show(exception.Message, "Erreur", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-                else
-                {
-                    ClassPlacements.GetPlacements().LoadPlacementsFromDataStorage(info, out info.m_ID);
-                    if (info.m_ID != -1)
-                    {
-                        AddPlacementsInList();
-                    }
-                }
             }
         }
 
@@ -1072,61 +922,6 @@ namespace Compta
             expenseControls.CheckBoxRemoveFromAnnualReport = checkBoxRemoveFromAnnualReport2;
 
             m_expensesDisplayData = new DisplayData(this, expenseControls, ListBoxDepenses2_SelectedIndexChanged, EType.e_Expense);
-
-            UIControlsStruct pretControls = new UIControlsStruct();
-
-            pretControls.TransactionListBox = listBoxPrets4;
-            pretControls.RadioButtonIsManual = radioButtonIsManual4;
-            pretControls.RadioButtonIsAutomatic = radioButtonIsAutomatic4;
-            pretControls.ComboBoxFirstTimeInMonth = comboBoxFirstTimeInMonth4;
-            pretControls.ComboBoxPeriodLength = comboBoxPeriodLength4;
-            pretControls.ComboBoxSecondTimeInMonth = comboBoxSecondTimeInMonth4;
-            pretControls.DateEnd = null;
-            pretControls.DateStart = dateStart4;
-            pretControls.LabelAmount = labelAmount4;
-            pretControls.LabelBalance = labelBalance4;
-            pretControls.LabelWarning = labelWarning4;
-            pretControls.LabelDollar = labelDollars4;
-            pretControls.LabelEndDate = null;
-            pretControls.LabelFirstTimeInMonth = labelFirstTimeInMonth4;
-            pretControls.LabelPeriod = labelPeriod4;
-            pretControls.LabelSecondTimeInMonth = labelSecondTimeInMonth4;
-            pretControls.LabelStartDate = labelStartDate4;
-            pretControls.LabelFirstTimeInMonth = labelFirstTimeInMonth4;
-            pretControls.LabelPeriod = labelPeriod4;
-            pretControls.LabelSecondTimeInMonth = labelSecondTimeInMonth4;
-            pretControls.LabelStartDate = labelStartDate4;
-            pretControls.RadioOneShotTrans = null;
-            pretControls.RadioPeriodicTrans = radioPeriodicTrans4;
-            pretControls.RadioTwoTimesInMonthTrans = radioTwoTimesInMonthTrans4;
-            pretControls.TextBoxAmount = textBoxAmount4;
-            pretControls.DataGridAmountAlreadyPayed = dataGridViewAmountAlreadyPayed4;
-            pretControls.TextBoxNotes = textBoxNotes4;
-            pretControls.TextBoxPeriod = textBoxPeriod4;
-            pretControls.TextBoxTransactionName = textBoxPretName4;
-            pretControls.LabelTransactionName = labelPretName4;
-            pretControls.LabelNotes = labelNotes4;
-            pretControls.PanelBalanceAndButtons = panelBalanceAndButtons4;
-            pretControls.ButtonNewTransaction =  buttonNewPret;
-            pretControls.ButtonDeleteTransaction = buttonDeletePret4;
-            pretControls.ButtonSaveTransaction = buttonSavePret4;
-            pretControls.LabelVirement = null;
-            pretControls.ButtonCancelTransaction = buttonCancelPret4;
-            pretControls.LabelCategory = labelCategory4;
-            pretControls.ComboBoxCategory = comboBoxCategory4;
-            pretControls.CheckBoxRemoveFromAnnualReport = checkBoxRemoveFromAnnualReport4;
-            pretControls.ComboBoxPretType = comboBoxPretType4;
-            pretControls.TextBoxPretInterestRate = textBoxInterestRate4;
-            pretControls.ComboBoxPretPaiementType = comboBoxPaiementType4; 
-            pretControls.TextBoxPretPaiementAmount = textBoxPaiementAmount4;
-            pretControls.LabelPretType = labelPretType4;
-            pretControls.LabelInterestRate = labelInterestRate4;
-            pretControls.LabelPercent = labelPercent4;
-            pretControls.LabelPaiementType = labelPaiementType4;
-            pretControls.LabelInterestsPaiedDay = labelInterestsPayDay;
-            pretControls.ComboBoxInterestsPaiedDay = comboBoxInterestsPayDay;
-            
-            m_pretsDisplayData = new DisplayData(this, pretControls, listBoxPrets4_SelectedIndexChanged, EType.e_Pret);
         }
 
         private int GetSelectedAccountId()
@@ -1146,18 +941,12 @@ namespace Compta
 
         #endregion
 
-        private double m_totalPlacements = 0;
-        private Dictionary<EPlacementType, double> m_totalRendements = new Dictionary<EPlacementType,double>();
-        private double m_totalPercentPerYear;
-        private Dictionary<EPlacementType, DateTime> m_mostRecentRendementDates = new Dictionary<EPlacementType,DateTime>();
         public DateTime CurrentEndPredictionDate;
         public DateTime CurrentStartPredictionDate;
         private TabPage m_tabPageSolde;
         private TabPage m_tabPageIncomes;
         private TabPage m_tabPageExpenses;
-        private TabPage m_tabPagePrets;
         private TabPage m_tabPageHistorique;
-        private TabPage m_tabPagePlacements;
         private TabPage m_tabPageLeftSummary;
                 
         private const string TAB_SUMMARY = "tabPageLeftSummary";

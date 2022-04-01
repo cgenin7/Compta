@@ -53,12 +53,9 @@ namespace Comptability
             {
                 foreach (TTransactionInfo info in m_Transactions.Values)
                 {
-                    if (info.m_Type != EType.e_Pret)
-                    {
-                        info.m_AmountAlreadyPayed = "0";
-                        info.m_StartDate = new DateTime(currentYear, info.m_StartDate.Month, info.m_StartDate.Day);
-                        info.m_EndDate = new DateTime(currentYear, info.m_EndDate.Month, info.m_EndDate.Day);
-                    }
+                    info.m_AmountAlreadyPayed = "0";
+                    info.m_StartDate = new DateTime(currentYear, info.m_StartDate.Month, info.m_StartDate.Day);
+                    info.m_EndDate = new DateTime(currentYear, info.m_EndDate.Month, info.m_EndDate.Day);
                 }
                 SaveTransactionsInDataStorage(out ex);
             }
@@ -72,18 +69,15 @@ namespace Comptability
 
             foreach (TTransactionInfo info in m_Transactions.Values)
             {
-                if (info.m_Type != EType.e_Pret)
+                if (info.m_StartDate.Year != currentYear)
                 {
-                    if (info.m_StartDate.Year != currentYear)
-                    {
-                        info.m_StartDate = new DateTime(currentYear, info.m_StartDate.Month, info.m_StartDate.Day);
-                        changesDone = true;
-                    }
-                    if (info.m_EndDate.Year != currentYear)
-                    {
-                        info.m_EndDate = new DateTime(currentYear, info.m_EndDate.Month, info.m_EndDate.Day);
-                        changesDone = true;
-                    }
+                    info.m_StartDate = new DateTime(currentYear, info.m_StartDate.Month, info.m_StartDate.Day);
+                    changesDone = true;
+                }
+                if (info.m_EndDate.Year != currentYear)
+                {
+                    info.m_EndDate = new DateTime(currentYear, info.m_EndDate.Month, info.m_EndDate.Day);
+                    changesDone = true;
                 }
             }
             if (changesDone)

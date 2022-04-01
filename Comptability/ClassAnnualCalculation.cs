@@ -65,7 +65,7 @@ namespace Comptability
                     detailType = EType.e_Income;
                     AddEntry(info, detailType, annualInfo, amount);
                 }
-                if (info.m_Type == EType.e_Expense || info.m_Type == EType.e_Pret)
+                if (info.m_Type == EType.e_Expense)
                 {
                     annualInfo.TotalExpenses += amount;
                     detailType = EType.e_Expense;
@@ -98,17 +98,10 @@ namespace Comptability
             if (endDate.Year > year)
                 endDate = new DateTime(year, 12, 31);
 
-            if (info.m_Type == EType.e_Pret)
-            {
-                while (startDate.Year < year)
-                    startDate = Util.GetNextPaiementDate(info, startDate);
-            }
-
+     
             if (startDate.Year == year && endDate.Year == year)
             {
                 int nbPeriods = Util.GetNbPeriods(info, startDate, endDate);
-                if (info.m_Type == EType.e_Pret)
-                    return nbPeriods * info.m_PretAmountPerPaiement;
                 return nbPeriods * info.m_Amount;
             }
             return 0;
