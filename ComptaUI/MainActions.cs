@@ -188,12 +188,11 @@ namespace Compta
                             }
                             if (reinitializeAllTransactions)
                             {
-                                Exception ex;
-                                ClassTransactions.GetTransactions().ReinitializeAllTransactions(out ex);
+                                ClassTransactions.GetTransactions().ReinitializeAllTransactions();
                                 if (ClassHistory.GetHistory().HistoryInfo != null)
                                 {
                                     ClassHistory.GetHistory().HistoryInfo.Clear();
-                                    ClassHistory.GetHistory().SaveHistoryInDataStorage(m_currentAccountId, out ex);
+                                    ClassHistory.GetHistory().SaveHistoryInDataStorage(m_currentAccountId);
                                 }
                             }
                             DateTime startPredictionDate = (DateTime.Now.Date >= CurrentStartPredictionDate.Date ? DateTime.Now.AddDays(1) : CurrentStartPredictionDate);
@@ -290,8 +289,7 @@ namespace Compta
 
             ClassHistory.GetHistory().LoadHistoryFromDataStorage(m_currentAccountId);
 
-            Exception ex;
-            ClassTransactions.GetTransactions().VerifyTransactionDates(out ex);
+            ClassTransactions.GetTransactions().VerifyTransactionDates();
             
             FillUpControls();
 
@@ -379,8 +377,11 @@ namespace Compta
 
             foreach (TAccountInfo account in ClassAccounts.GetAccounts().AccountsInfo.Values)
             {
-                TPredictedBalance predictedBalance = new TPredictedBalance(account.AccountId, startPredictionDate, CurrentEndPredictionDate);
-                soldePredit += GetPredictedBalanceAtSpecificDate(account.Balance, ref predictedBalance);
+                if (!account.RemoveFromSummary)
+                {
+                    TPredictedBalance predictedBalance = new TPredictedBalance(account.AccountId, startPredictionDate, CurrentEndPredictionDate);
+                    soldePredit += GetPredictedBalanceAtSpecificDate(account.Balance, ref predictedBalance);
+                }
             }
 
             labelPredictedBalance0.Text = ClassTools.ConvertCurrencyToString(soldePredit);
@@ -663,13 +664,8 @@ namespace Compta
                     }
                 }
                 ClassHistory.GetHistory().HistoryInfo = newHistories;
-                Exception exception;
-                ClassHistory.GetHistory().SaveHistoryInDataStorage(CurrentAccountId, out exception);
+                ClassHistory.GetHistory().SaveHistoryInDataStorage(CurrentAccountId);
 
-                if (exception != null)
-                {
-                    MessageBox.Show(exception.Message, "Erreur", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
                 while (ListBoxHistorique5.SelectedIndices.Count > 0)
                     ListBoxHistorique5.Items.RemoveAt(ListBoxHistorique5.SelectedIndices[0]);
                 if (ListBoxHistorique5.Items.Count > 0)
@@ -709,12 +705,7 @@ namespace Compta
                             histories.Add(info);
                             histories[histories.Count - 1].m_HistoryDate = DateTime.Today;
                         }
-                        Exception exception;
-                        ClassHistory.GetHistory().SaveHistoryInDataStorage(account.AccountId, out exception);
-                        if (exception != null)
-                        {
-                            MessageBox.Show(exception.Message, "Erreur", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        }
+                        ClassHistory.GetHistory().SaveHistoryInDataStorage(account.AccountId);
                     }
                 }
             }
@@ -794,8 +785,7 @@ namespace Compta
             InvertIDs(listBoxToReorder, listBoxIndex1, listBoxIndex2);
 
             listBoxToReorder.SelectedIndex = selectedIndex - 1;
-            Exception ex;
-            ClassTransactions.GetTransactions().SaveTransactionsInDataStorage(out ex);
+            ClassTransactions.GetTransactions().SaveTransactionsInDataStorage();
         }
 
         private void PutItemDownInList(ListBox listBoxToReorder)
@@ -810,8 +800,7 @@ namespace Compta
             InvertIDs(listBoxToReorder, listBoxIndex1, listBoxIndex2);
 
             listBoxToReorder.SelectedIndex = selectedIndex + 1;
-            Exception ex;
-            ClassTransactions.GetTransactions().SaveTransactionsInDataStorage(out ex);
+            ClassTransactions.GetTransactions().SaveTransactionsInDataStorage();
         }
 
         private void InvertIDs(ListBox listBoxToReorder, int listBoxIndex1, int listBoxIndex2)

@@ -28,28 +28,13 @@ namespace ComptaDB
                     {
                         THistoryInfo info = new THistoryInfo();
 
-                        try
-                        {
-                            info.m_HistoryDate = aReader.GetDateTime(0);
-                            info.m_AccountId = aReader.GetInt16(1);
-                            info.m_Incomes = aReader.GetDouble(2);
-                            info.m_Expenses = aReader.GetDouble(3);
-                            info.m_AccountBalance = aReader.GetDouble(4);
+                        info.m_HistoryDate = aReader.GetDateTime(0);
+                        info.m_AccountId = aReader.GetInt16(1);
+                        info.m_Incomes = aReader.GetDouble(2);
+                        info.m_Expenses = aReader.GetDouble(3);
+                        info.m_AccountBalance = aReader.GetDouble(4);
                             
-                            try // new fields, not in old db
-                            {
-                                info.m_TransferIncomes = aReader.GetDouble(5);
-                                info.m_TransferExpenses = aReader.GetDouble(6);
-                                info.m_PredictionDate = aReader.GetDateTime(10);
-                            }
-                            catch
-                            { }
-
-                            HistoryInfo.Add(info);
-                        }
-                        catch (InvalidCastException)
-                        {
-                        }
+                        HistoryInfo.Add(info);
                     }
 
                     aReader.Close();
@@ -65,11 +50,10 @@ namespace ComptaDB
             return null;
         }
 
-        public static void SaveHistoryInfo(List<THistoryInfo> HistoryInfo, int AccountId, out Exception exception)
+        public static void SaveHistoryInfo(List<THistoryInfo> HistoryInfo, int AccountId)
         {
             OleDbConnection DBConnection;
 
-            exception = null;
             if (ClassDataAccess.OpenComptaDataSource(out DBConnection))
             {
                 OleDbTransaction MyTransaction = DBConnection.BeginTransaction(System.Data.IsolationLevel.ReadCommitted);
@@ -100,11 +84,11 @@ namespace ComptaDB
                     MyTransaction.Commit();
                     ClassDataAccess.CloseDataSource(DBConnection);
                 }
-                catch (Exception e)
+                catch
                 {
-                    exception = e;
                     MyTransaction.Rollback();
                     ClassDataAccess.CloseDataSource(DBConnection);
+                    throw;
                 }
             }
         }

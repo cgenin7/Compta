@@ -31,29 +31,16 @@ namespace ComptaDB
                         info.AccountId = aReader.GetInt16(0);
                         info.AccountName = aReader.GetString(1);
                         info.Balance = aReader.GetDouble(2);
-                        try
-                        {
-                            info.StartPrediction = aReader.GetDateTime(3);
-                        }
-                        catch
-                        {
-                            info.StartPrediction = DateTime.Now;
-                        }
+                        info.StartPrediction = aReader.GetDateTime(3);
                         info.PredictionDate = aReader.GetDateTime(4);
                         info.IncomesAtPredictionDate = aReader.GetDouble(5);
                         info.ExpensesAtPredictionDate = aReader.GetDouble(6);
+                        info.Note = aReader.GetString(7);
+                        info.MortgageBalance = aReader.GetDouble(8);
+                        info.RemoveFromSummary = aReader.GetBoolean(9);
 
-                        try
-                        {
-                            info.Note = aReader.GetString(7);
-                            info.MortgageBalance = aReader.GetDouble(8);
-                        }
-                        catch 
-                        {
-                            // CGe add log
-                        }
-                        
                         accountsInfo.Add(info.AccountId, info);
+
                     }
 
                     aReader.Close();
@@ -61,7 +48,7 @@ namespace ComptaDB
                 catch (OleDbException)
                 {
                     ClassDataAccess.CloseDataSource(DBConnection);
-                    return null;
+                    throw;
                 }
                 ClassDataAccess.CloseDataSource(DBConnection);
                 return accountsInfo;
@@ -90,7 +77,8 @@ namespace ComptaDB
                             //create the command object and store the sql query
                             ClassDataAccess.ExecuteCommand("INSERT INTO AccountInfo VALUES ( " + info.AccountId + ", '" + info.AccountName + "', " + info.Balance.ToString(NumberFormatInfo.InvariantInfo) +
                                 ", '" + info.StartPrediction.ToShortDateString() + "', '" + info.PredictionDate.ToShortDateString() + "', " + info.IncomesAtPredictionDate.ToString(NumberFormatInfo.InvariantInfo) + ", " +
-                                info.ExpensesAtPredictionDate.ToString(NumberFormatInfo.InvariantInfo) + ", '" + info.Note.Replace("'", "''") + "', " + info.MortgageBalance.ToString(NumberFormatInfo.InvariantInfo) + ")", 
+                                info.ExpensesAtPredictionDate.ToString(NumberFormatInfo.InvariantInfo) + ", '" + info.Note.Replace("'", "''") + "', " + info.MortgageBalance.ToString(NumberFormatInfo.InvariantInfo) + ", " +
+                                info.RemoveFromSummary + ")", 
                                 MyTransaction, DBConnection);
                             i++;
                         }
@@ -103,6 +91,7 @@ namespace ComptaDB
                     exception = e;
                     MyTransaction.Rollback();
                     ClassDataAccess.CloseDataSource(DBConnection);
+                    throw;
                 }
             }
         }
@@ -111,7 +100,8 @@ namespace ComptaDB
         {
             ClassDataAccess.ExecuteQuery("INSERT INTO AccountInfo VALUES ( " + info.AccountId + ", '" + info.AccountName + "', " + info.Balance.ToString(NumberFormatInfo.InvariantInfo) +
                                 ", '" + info.StartPrediction.ToShortDateString() + "', '" + info.PredictionDate.ToShortDateString() + "', " + info.IncomesAtPredictionDate.ToString(NumberFormatInfo.InvariantInfo) + ", " +
-                                info.ExpensesAtPredictionDate.ToString(NumberFormatInfo.InvariantInfo) + ", '" + info.Note.Replace("'", "''") + "', " + info.MortgageBalance.ToString(NumberFormatInfo.InvariantInfo) + ")");
+                                info.ExpensesAtPredictionDate.ToString(NumberFormatInfo.InvariantInfo) + ", '" + info.Note.Replace("'", "''") + "', " + info.MortgageBalance.ToString(NumberFormatInfo.InvariantInfo) + ", " +
+                                info.RemoveFromSummary + ")");
         }
 
         public static void DeleteAccountInfo(int accountId)

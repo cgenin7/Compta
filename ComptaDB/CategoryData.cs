@@ -26,16 +26,10 @@ namespace ComptaDB
                     {
                         TCategoryInfo info = new TCategoryInfo();
 
-                        try
-                        {
-                            info.Id = aReader.GetInt16(0);
-                            info.Name = aReader.GetString(1).Trim();
+                        info.Id = aReader.GetInt16(0);
+                        info.Name = aReader.GetString(1).Trim();
 
-                            categoryInfo.Add(info);
-                        }
-                        catch (InvalidCastException)
-                        {
-                        }
+                        categoryInfo.Add(info);
                     }
 
                     aReader.Close();
@@ -43,7 +37,7 @@ namespace ComptaDB
                 catch (OleDbException)
                 {
                     ClassDataAccess.CloseDataSource(DBConnection);
-                    return null;
+                    throw;
                 }
                 ClassDataAccess.CloseDataSource(DBConnection);
                 return categoryInfo;

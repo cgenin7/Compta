@@ -70,8 +70,7 @@ namespace Compta
         {
             int curSelIndex = UIControls.TransactionListBox.SelectedIndex;
             Dictionary<int, TTransactionInfo> transactions = ClassTransactions.GetTransactions().Transactions;
-            Exception exception = null;
-
+           
             m_lastDisplayedTransaction = TransferFromFormToStructure(transToSaveIndex);
             if (m_lastDisplayedTransaction != null)
             {
@@ -84,13 +83,7 @@ namespace Compta
                 {
                     curSelIndex = UIControls.TransactionListBox.Items.Count;
                     transToSaveIndex = curSelIndex;
-                    ClassTransactions.GetTransactions().AddTransactionInDataStorage(m_lastDisplayedTransaction, out exception);
-                    if (exception != null)
-                    {
-                        MessageBox.Show(exception.Message, "Erreur", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return;
-                    }
-
+                    ClassTransactions.GetTransactions().AddTransactionInDataStorage(m_lastDisplayedTransaction);
                     ClassTransactions.GetTransactions().LoadTransactionFromDataStorage(m_lastDisplayedTransaction, out m_lastDisplayedTransaction.m_ID);
                     transactions.Add(m_lastDisplayedTransaction.m_ID, m_lastDisplayedTransaction);
                 }
@@ -104,12 +97,7 @@ namespace Compta
                             if (info.ID >= 0 && transactions.ContainsKey(info.ID))
                             {
                                 transactions[info.ID] = m_lastDisplayedTransaction;
-                                ClassTransactions.GetTransactions().UpdateTransactionInDataStorage(m_lastDisplayedTransaction, out exception);
-                                if (exception != null)
-                                {
-                                    MessageBox.Show(exception.Message, "Erreur", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                    return;
-                                }
+                                ClassTransactions.GetTransactions().UpdateTransactionInDataStorage(m_lastDisplayedTransaction);
                             }
                             else
                             {
@@ -163,18 +151,13 @@ namespace Compta
                     TDisplayInfo info = UIControls.TransactionListBox.Items[curSelection] as TDisplayInfo;
                     if (info != null && info.ID != -1)
                     {
-                        Exception exception;
                         Dictionary<int, TTransactionInfo> transactions = ClassTransactions.GetTransactions().Transactions;
                         if (transactions.ContainsKey(info.ID))
                         {
                             transactions.Remove(info.ID);
                             m_lastDisplayedTransaction = null;
 
-                            ClassTransactions.GetTransactions().DeleteTransactionFromDataStorage(info.ID, out exception);
-                            if (exception != null)
-                            {
-                                MessageBox.Show(exception.Message, "Erreur", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            }
+                            ClassTransactions.GetTransactions().DeleteTransactionFromDataStorage(info.ID);
                             UIControls.TransactionListBox.Items.RemoveAt(curSelection);
 
                             if (curSelection > 0)

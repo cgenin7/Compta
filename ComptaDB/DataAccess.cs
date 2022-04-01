@@ -23,13 +23,7 @@ namespace ComptaDB
                     //Iterate through the database
                     while (aReader.Read())
                     {
-                        try
-                        {
-                            Note = aReader.GetString(0);
-                        }
-                        catch (InvalidCastException)
-                        {
-                        }
+                        Note = aReader.GetString(0);
                     }
 
                     aReader.Close();
@@ -37,7 +31,7 @@ namespace ComptaDB
                 catch (OleDbException)
                 {
                     CloseDataSource(DBConnection);
-                    return "";
+                    throw;
                 }
                 CloseDataSource(DBConnection);
                 return Note;
@@ -56,7 +50,7 @@ namespace ComptaDB
             }
             catch (OleDbException)
             {
-                return false;
+                throw;
             }
             return true;
         }
@@ -109,10 +103,10 @@ namespace ComptaDB
 
                     CloseDataSource(DBConnection);
                 }
-                catch (Exception ex)
+                catch
                 {
                     CloseDataSource(DBConnection);
-                    throw ex;
+                    throw;
                 }
             }
         }

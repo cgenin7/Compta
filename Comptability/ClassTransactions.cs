@@ -44,11 +44,10 @@ namespace Comptability
             m_Categories = CategoryData.GetCategories();
         }
 
-        public void ReinitializeAllTransactions(out Exception ex)
+        public void ReinitializeAllTransactions()
         {
             int currentYear = LocalSettings.BudgetYear;
-            ex = null;
-
+           
             if (m_Transactions != null)
             {
                 foreach (TTransactionInfo info in m_Transactions.Values)
@@ -57,16 +56,15 @@ namespace Comptability
                     info.m_StartDate = new DateTime(currentYear, info.m_StartDate.Month, info.m_StartDate.Day);
                     info.m_EndDate = new DateTime(currentYear, info.m_EndDate.Month, info.m_EndDate.Day);
                 }
-                SaveTransactionsInDataStorage(out ex);
+                SaveTransactionsInDataStorage();
             }
         }
 
-        public void VerifyTransactionDates(out Exception ex)
+        public void VerifyTransactionDates()
         {
             int currentYear = LocalSettings.BudgetYear;
             bool changesDone = false;
-            ex = null;
-
+           
             foreach (TTransactionInfo info in m_Transactions.Values)
             {
                 if (info.m_StartDate.Year != currentYear)
@@ -81,30 +79,29 @@ namespace Comptability
                 }
             }
             if (changesDone)
-                SaveTransactionsInDataStorage(out ex);
+                SaveTransactionsInDataStorage();
         }
 
-        public void SaveTransactionsInDataStorage(out Exception exception)
+        public void SaveTransactionsInDataStorage()
 		{
-            exception = null;
             Dictionary<int, TAccountInfo> accountsInfo = ClassAccounts.GetAccounts().AccountsInfo;
 			foreach (TAccountInfo account in accountsInfo.Values)
 			{
                 if (account != null)
 				{
-                    SaveTransactionsInDataStorage(account.AccountId, out exception);
+                    SaveTransactionsInDataStorage(account.AccountId);
 				}
 			}
 		}
 
-        public void AddTransactionInDataStorage(TTransactionInfo info, out Exception exception)
+        public void AddTransactionInDataStorage(TTransactionInfo info)
 		{
-            TransactionInfoData.SaveTransaction(info, true, out exception);
+            TransactionInfoData.SaveTransaction(info, true);
         }
 
-        public void UpdateTransactionInDataStorage(TTransactionInfo info, out Exception exception)
+        public void UpdateTransactionInDataStorage(TTransactionInfo info)
         {
-            TransactionInfoData.SaveTransaction(info, false, out exception);
+            TransactionInfoData.SaveTransaction(info, false);
         }
 
         public void LoadTransactionFromDataStorage(TTransactionInfo transactionToFind, out int transactionId)
@@ -112,21 +109,19 @@ namespace Comptability
             m_Transactions = TransactionInfoData.GetTransactionsInfo(transactionToFind, out transactionId);
         }
 
-        public void SaveTransactionsInDataStorage(int AccountId, out Exception exception)
+        public void SaveTransactionsInDataStorage(int AccountId)
 		{
-            exception = null;
-			if ( m_Transactions != null )
+            if ( m_Transactions != null )
 			{
-                TransactionInfoData.SaveTransactionsInfo(m_Transactions, AccountId, out exception);
+                TransactionInfoData.SaveTransactionsInfo(m_Transactions, AccountId);
 			}
 		}
 
-        public void DeleteTransactionFromDataStorage(int transactionId, out Exception exception)
+        public void DeleteTransactionFromDataStorage(int transactionId)
         {
-            exception = null;
             if (m_Transactions != null)
             {
-                TransactionInfoData.DeleteTransaction(transactionId, out exception);
+                TransactionInfoData.DeleteTransaction(transactionId);
             }
         }
 

@@ -37,11 +37,10 @@ namespace Comptability
             m_HistoryInfo = HistoryInfoData.GetHistoryInfo(accountId);
 		}
 
-        public void SaveHistoryInDataStorage(int accountId, out Exception exception)
+        public void SaveHistoryInDataStorage(int accountId)
 		{
-            exception = null;
-			if ( m_HistoryInfo != null )
-                HistoryInfoData.SaveHistoryInfo(m_HistoryInfo, accountId, out exception);
+            if ( m_HistoryInfo != null )
+                HistoryInfoData.SaveHistoryInfo(m_HistoryInfo, accountId);
 		}
 	}
 }

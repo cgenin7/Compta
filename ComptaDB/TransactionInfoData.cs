@@ -20,11 +20,10 @@ namespace ComptaDB
             return GetTransactionsInfo(transactionToFind, out transactionId, true);
         }
 
-        public static void SaveTransaction(TTransactionInfo info, bool isNewTransaction, out Exception exception)
+        public static void SaveTransaction(TTransactionInfo info, bool isNewTransaction)
         {
             OleDbConnection DBConnection;
 
-            exception = null;
             if (ClassDataAccess.OpenComptaDataSource(out DBConnection))
             {
                 OleDbTransaction MyTransaction = DBConnection.BeginTransaction(System.Data.IsolationLevel.ReadCommitted);
@@ -38,20 +37,19 @@ namespace ComptaDB
                     MyTransaction.Commit();
                     ClassDataAccess.CloseDataSource(DBConnection);
                 }
-                catch (Exception e)
+                catch
                 {
-                    exception = e;
                     MyTransaction.Rollback();
                     ClassDataAccess.CloseDataSource(DBConnection);
+                    throw;
                 }
             }
         }
 
-        public static void SaveTransactionsInfo(Dictionary<int, TTransactionInfo> transactions, int AccountId, out Exception exception)
+        public static void SaveTransactionsInfo(Dictionary<int, TTransactionInfo> transactions, int AccountId)
         {
             OleDbConnection DBConnection;
 
-            exception = null;
             if (ClassDataAccess.OpenComptaDataSource(out DBConnection))
             {
                 OleDbTransaction MyTransaction = DBConnection.BeginTransaction(System.Data.IsolationLevel.ReadCommitted);
@@ -75,26 +73,18 @@ namespace ComptaDB
                     MyTransaction.Commit();
                     ClassDataAccess.CloseDataSource(DBConnection);
                 }
-                catch (Exception e)
+                catch
                 {
-                    exception = e;
                     MyTransaction.Rollback();
                     ClassDataAccess.CloseDataSource(DBConnection);
+                    throw;
                 }
             }
         }
 
-        public static void DeleteTransaction(int transactionId, out Exception exception)
+        public static void DeleteTransaction(int transactionId)
         {
-            exception = null;
-            try
-            {
-                ClassDataAccess.ExecuteQuery("DELETE FROM TransactionInfo WHERE ID = " + transactionId);
-            }
-            catch (Exception e)
-            {
-                exception = e;
-            }
+            ClassDataAccess.ExecuteQuery("DELETE FROM TransactionInfo WHERE ID = " + transactionId);
         }
 
         private static Dictionary<int, TTransactionInfo> GetTransactionsInfo(TTransactionInfo transactionToFind, out int transactionId, bool performUpgrade)
@@ -117,52 +107,36 @@ namespace ComptaDB
                     {
                         TTransactionInfo info = new TTransactionInfo();
 
-                        try
-                        {
-                            info.m_ID = aReader.GetInt32(0);
-                            info.m_AccountId = aReader.GetInt16(1);
-                            info.m_TransactionName = aReader.GetString(2);
-                            info.m_eTransactionType = (ETransactionType)aReader.GetInt16(3);
-                            info.m_Amount = aReader.GetDouble(4);
-                            info.m_StartDate = aReader.GetDateTime(5);
-                            info.m_EndDate = aReader.GetDateTime(6);
-                            info.m_Period = aReader.GetInt16(7);
-                            info.m_PeriodLength = (EPeriodLength)aReader.GetInt16(8);
-                            info.m_FirstTimeInMonth = aReader.GetInt16(9);
-                            info.m_FirstTimeInMonth = (info.m_FirstTimeInMonth > 29 ? 29 : info.m_FirstTimeInMonth);
-                            info.m_SecondTimeInMonth = aReader.GetInt16(10);
-                            info.m_SecondTimeInMonth = (info.m_SecondTimeInMonth > 29 ? 29 : info.m_SecondTimeInMonth);
-                            info.m_AmountAlreadyPayed = aReader.GetString(11);
-                            info.m_Note = aReader.GetString(12);
-                            info.m_TransactionMode = (ETransactionMode)aReader.GetInt16(13);
-                            // info.m_TransferAccountId = aReader.GetInt16(14);
-                            // info.m_virementSoldeDuCompte = aReader.GetBoolean(15);
-                            info.m_nextVirementDate = aReader.GetDateTime(16);
-                            info.m_nextVirementAmount = aReader.GetDouble(17);
-                            info.m_Category = aReader.GetInt16(18);
-                            info.m_Type = (EType)aReader.GetInt16(19);
+                        info.m_ID = aReader.GetInt32(0);
+                        info.m_AccountId = aReader.GetInt16(1);
+                        info.m_TransactionName = aReader.GetString(2);
+                        info.m_eTransactionType = (ETransactionType)aReader.GetInt16(3);
+                        info.m_Amount = aReader.GetDouble(4);
+                        info.m_StartDate = aReader.GetDateTime(5);
+                        info.m_EndDate = aReader.GetDateTime(6);
+                        info.m_Period = aReader.GetInt16(7);
+                        info.m_PeriodLength = (EPeriodLength)aReader.GetInt16(8);
+                        info.m_FirstTimeInMonth = aReader.GetInt16(9);
+                        info.m_FirstTimeInMonth = (info.m_FirstTimeInMonth > 29 ? 29 : info.m_FirstTimeInMonth);
+                        info.m_SecondTimeInMonth = aReader.GetInt16(10);
+                        info.m_SecondTimeInMonth = (info.m_SecondTimeInMonth > 29 ? 29 : info.m_SecondTimeInMonth);
+                        info.m_AmountAlreadyPayed = aReader.GetString(11);
+                        info.m_Note = aReader.GetString(12);
+                        info.m_TransactionMode = (ETransactionMode)aReader.GetInt16(13);
+                        info.m_nextVirementDate = aReader.GetDateTime(16);
+                        info.m_nextVirementAmount = aReader.GetDouble(17);
+                        info.m_Category = aReader.GetInt16(18);
+                        info.m_Type = (EType)aReader.GetInt16(19);
                         
-                            info.m_RemoveFromAnnualReport = (aReader.GetInt16(24) == 0 ? false : true);
-                            try
-                            {
-                                info.m_OrderID = aReader.GetInt16(26);
-                            }
-                            catch
-                            {
-                                info.m_OrderID = 0;
-                            }
-                            if (transactionToFind != null)
-                            {
-                                if (transactionToFind.IsEqual(info))
-                                    transactionId = info.m_ID;
-                            }
-
-                            transactions.Add(info.m_ID, info);
-                        }
-                        catch (Exception ex)
+                        info.m_RemoveFromAnnualReport = (aReader.GetInt16(24) == 0 ? false : true);
+                        info.m_OrderID = aReader.GetInt16(26);
+                        if (transactionToFind != null)
                         {
-                            throw ex;
+                            if (transactionToFind.IsEqual(info))
+                                transactionId = info.m_ID;
                         }
+
+                        transactions.Add(info.m_ID, info);
                     }
 
                     aReader.Close();

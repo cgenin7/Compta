@@ -28,6 +28,7 @@ namespace ComptaCommun
         public double TransferExpenses;
         public string Note;
         public double MortgageBalance;
+        public bool RemoveFromSummary;
 
         // Not Saved in DB
         public ArrayList m_Warnings; // Contains TWarningInfo, not saved in database
