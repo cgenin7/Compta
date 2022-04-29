@@ -432,6 +432,8 @@ namespace Compta
         // Add transaction info in ToCome list if something is going on for the next month
         private void FillUpToComeForAllAccounts()
         {
+            var accountsToExclude = ClassAccounts.GetAccounts().GetRemovedFromSummaryAccounts();
+
             listBoxToComeExpense.Items.Clear();
             listBoxToComeIncome.Items.Clear();
 
@@ -442,9 +444,8 @@ namespace Compta
                 foreach (int transID in transactions.Keys)
                 {
                     TTransactionInfo info = transactions[transID];
-                    if (info != null)
+                    if (info != null && !accountsToExclude.Contains(info.m_AccountId))
                         AddToComeTransaction(info);
-                    
                 }
             }
 

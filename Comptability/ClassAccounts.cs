@@ -80,6 +80,17 @@ namespace Comptability
             return null;
         }
 
+        public List<int> GetRemovedFromSummaryAccounts()
+        {
+            var res = new List<int>();
+            foreach (TAccountInfo account in m_AccountsInfo.Values)
+            {
+                if (account != null && account.RemoveFromSummary == true)
+                    res.Add(account.AccountId);
+            }
+            return res;
+        }
+
         public int FindNextAccountId()
         {
             int maxNb = 0;
