@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Windows.Forms;
-using System.IO;
+﻿using Comptability;
 using ComptaCommun;
-using ComptaDB;
-using Comptability;
+using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
+using System.Windows.Forms;
 
 namespace Compta
 {
