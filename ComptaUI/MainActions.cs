@@ -603,7 +603,7 @@ namespace Compta
 
         private void FillUpPredictedBalances()
         {
-            DateTime startDate = (DateTime.Now.Date >= CurrentStartPredictionDate.Date ? DateTime.Now.AddDays(1) : CurrentStartPredictionDate);
+            DateTime startDate = (DateTime.Now.Date >= CurrentStartPredictionDate.Date ? DateTime.Now : CurrentStartPredictionDate);
 
             TAnnualRepartitionInfo annualInfo = ComptaCharts.InitializeChartAnnuals(chartAnnuals, LocalSettings.BudgetYear, m_currentAccountId, false);
 
