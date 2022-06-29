@@ -47,8 +47,7 @@ namespace Compta
 
             listBoxToCome.Sorted = false;
             TTransactionInfo copyInfo = new TTransactionInfo(info);
-            DateTime inOneMonthTime = DateTime.Now.AddMonths(1);
-            DateTime lastDayOfMonthTime = new DateTime(inOneMonthTime.Year, inOneMonthTime.Month, 1).AddDays(-1);
+            DateTime in15DaysTime = DateTime.Now.AddDays(15);
             bool bAdded = false;
             int itemInListIndex = GetListIndexFromId(listBoxToCome, copyInfo.m_ID);
 
@@ -66,7 +65,7 @@ namespace Compta
             {
                 DateTime startDate = DateTime.Now;
                 copyInfo.m_Balance = 0;
-                while (nextPaiementDate.Date <= lastDayOfMonthTime.Date)
+                while (nextPaiementDate.Date <= in15DaysTime.Date)
                 {
                     ClassCalculation.GetTransactionBalance(startDate, nextPaiementDate, ref copyInfo, false);
                     if (copyInfo.m_Balance <= 0.01)
@@ -85,6 +84,7 @@ namespace Compta
             }
             if (!bAdded && itemInListIndex >= 0)
                 listBoxToCome.Items.RemoveAt(itemInListIndex);
+
             listBoxToCome.Sorted = true;
         }
 
@@ -628,9 +628,9 @@ namespace Compta
             
             double soldeActuel = Utils.ConvertToDouble(textBoxSoldeActuel0.Text.Trim());
 
-            var lastDayOfMonth = new DateTime(startDate.Year, startDate.Month, 1).AddMonths(1).AddDays(-1);
+            var in15Days = startDate.AddDays(15);
 
-            ComptaCharts.InitializeChartPredictedBalances(this, chartPredictedBalances, startDate, lastDayOfMonth, soldeActuel, EPeriodLength.e_PerDay);
+            ComptaCharts.InitializeChartPredictedBalances(this, chartPredictedBalances, startDate, in15Days, soldeActuel, EPeriodLength.e_PerDay);
         }
         
       

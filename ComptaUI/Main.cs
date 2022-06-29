@@ -638,7 +638,7 @@ namespace Compta
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(271, 23);
             this.label1.TabIndex = 141;
-            this.label1.Text = "Revenus d\'ici la fin du mois";
+            this.label1.Text = "Revenus d\'ici 2 semaines";
             // 
             // listBoxToComeIncome
             // 
@@ -770,7 +770,7 @@ namespace Compta
             this.labelBudgetYear.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelBudgetYear.Location = new System.Drawing.Point(23, 45);
             this.labelBudgetYear.Name = "labelBudgetYear";
-            this.labelBudgetYear.Size = new System.Drawing.Size(61, 16);
+            this.labelBudgetYear.Size = new System.Drawing.Size(60, 16);
             this.labelBudgetYear.TabIndex = 132;
             this.labelBudgetYear.Text = "Budget:";
             this.labelBudgetYear.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -783,7 +783,7 @@ namespace Compta
             this.labelPredictedBalance0.ForeColor = System.Drawing.Color.Green;
             this.labelPredictedBalance0.Location = new System.Drawing.Point(209, 79);
             this.labelPredictedBalance0.Name = "labelPredictedBalance0";
-            this.labelPredictedBalance0.Size = new System.Drawing.Size(28, 16);
+            this.labelPredictedBalance0.Size = new System.Drawing.Size(27, 16);
             this.labelPredictedBalance0.TabIndex = 5;
             this.labelPredictedBalance0.Text = "0 $";
             // 
@@ -794,7 +794,7 @@ namespace Compta
             this.labelPredictedDate0.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelPredictedDate0.Location = new System.Drawing.Point(23, 79);
             this.labelPredictedDate0.Name = "labelPredictedDate0";
-            this.labelPredictedDate0.Size = new System.Drawing.Size(180, 16);
+            this.labelPredictedDate0.Size = new System.Drawing.Size(179, 16);
             this.labelPredictedDate0.TabIndex = 129;
             this.labelPredictedDate0.Text = "Solde à la fin de l\'année:";
             this.labelPredictedDate0.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -817,7 +817,7 @@ namespace Compta
             this.labelAVenir.Name = "labelAVenir";
             this.labelAVenir.Size = new System.Drawing.Size(271, 23);
             this.labelAVenir.TabIndex = 16;
-            this.labelAVenir.Text = "Dépenses d\'ici la fin du mois";
+            this.labelAVenir.Text = "Dépenses d\'ici 2 semaines";
             this.labelAVenir.Click += new System.EventHandler(this.labelAVenir_Click);
             // 
             // labelDollar0
@@ -837,7 +837,7 @@ namespace Compta
             this.labelSoldeActuel0.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelSoldeActuel0.Location = new System.Drawing.Point(23, 44);
             this.labelSoldeActuel0.Name = "labelSoldeActuel0";
-            this.labelSoldeActuel0.Size = new System.Drawing.Size(175, 16);
+            this.labelSoldeActuel0.Size = new System.Drawing.Size(174, 16);
             this.labelSoldeActuel0.TabIndex = 0;
             this.labelSoldeActuel0.Text = "Solde actuel du compte:";
             this.labelSoldeActuel0.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -863,7 +863,7 @@ namespace Compta
             this.chartPredictedBalances.MinimumSize = new System.Drawing.Size(664, 211);
             this.chartPredictedBalances.Name = "chartPredictedBalances";
             series1.ChartArea = "ChartArea1";
-            series1.CustomProperties = "DrawingStyle=Cylinder, LabelStyle=Top, MaxPixelPointWidth=10";
+            series1.CustomProperties = "MaxPixelPointWidth=10, LabelStyle=Top, DrawingStyle=Cylinder";
             series1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             series1.LabelBackColor = System.Drawing.Color.Transparent;
             series1.Name = "Series1";

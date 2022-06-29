@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using ComptaCommun;
+using System;
 using System.Windows.Forms;
-using ComptaCommun;
-using System.Reflection;
 
 namespace Compta
 {
