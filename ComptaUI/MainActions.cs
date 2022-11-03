@@ -39,6 +39,11 @@ namespace Compta
                 AddToComeTransaction(info, listBoxToComeExpense);
             else
                 AddToComeTransaction(info, listBoxToComeIncome);
+
+            var amount = ClassTools.ConvertCurrencyToString(listBoxToComeExpense.GetTotalAmount());
+            labelExpensesToCome.Text = $"Dépenses pour les 2 prochaines semaines: {amount}";
+            amount = ClassTools.ConvertCurrencyToString(listBoxToComeIncome.GetTotalAmount());
+            labelIncomesToCome.Text = $"Revenus pour les 2 prochaines semaines: {amount}";
         }
 
         private void AddToComeTransaction(TTransactionInfo info, ListBoxSortedByDate listBoxToCome)
@@ -52,36 +57,32 @@ namespace Compta
             int itemInListIndex = GetListIndexFromId(listBoxToCome, copyInfo.m_ID);
 
             DateTime nextPaiementDate = copyInfo.m_FirstPaiementDate.Date;
+           
             if (copyInfo.m_eTransactionType == ETransactionType.e_OneShotTransaction)
+            {
                 nextPaiementDate = copyInfo.m_StartDate;
-
-            string sToCome = "";
-            if (!string.IsNullOrEmpty(info.m_Warning) && !info.m_Warning.StartsWith(ClassTransactions.GOOD_NEWS))
-            {
-                sToCome = sAccountName + info.m_TransactionName + ": " + info.m_Warning;
-                AddItemToCome(listBoxToCome, itemInListIndex, sToCome, copyInfo, nextPaiementDate);
             }
-            else
-            {
-                DateTime startDate = DateTime.Now;
-                copyInfo.m_Balance = 0;
-                while (nextPaiementDate.Date <= in15DaysTime.Date)
-                {
-                    ClassCalculation.GetTransactionBalance(startDate, nextPaiementDate, ref copyInfo, false);
-                    if (copyInfo.m_Balance <= 0.01)
-                        break;
-                    
-                    bAdded = true;
-                    sToCome = sAccountName + TextFormatter.FormatToComeTransactionText(copyInfo, nextPaiementDate);
-                    AddItemToCome(listBoxToCome, itemInListIndex, sToCome, copyInfo, nextPaiementDate);
-                    
-                    startDate = nextPaiementDate.AddDays(1);
-                    DateTime oldNextPaimentDate = nextPaiementDate;
-                    nextPaiementDate = Util.GetNextPaiementDate(copyInfo, nextPaiementDate);
 
-                    if (oldNextPaimentDate.Date == nextPaiementDate.Date)
-                        break;
-                }
+            DateTime startDate = DateTime.Now;
+            copyInfo.m_Balance = 0;
+            while (nextPaiementDate.Date <= in15DaysTime.Date)
+            {
+                // Get next payment amount
+                ClassCalculation.GetTransactionBalance(startDate, nextPaiementDate, ref copyInfo, false);
+                if (copyInfo.m_Balance <= 0.01)
+                    break;
+                    
+                bAdded = true;
+
+                var sToCome = sAccountName + TextFormatter.FormatToComeTransactionText(copyInfo, nextPaiementDate);
+                AddItemToCome(listBoxToCome, itemInListIndex, sToCome, copyInfo, nextPaiementDate, copyInfo.m_Balance);
+                    
+                startDate = nextPaiementDate.AddDays(1);
+                DateTime oldNextPaimentDate = nextPaiementDate;
+                nextPaiementDate = Util.GetNextPaiementDate(copyInfo, nextPaiementDate);
+
+                if (oldNextPaimentDate.Date == nextPaiementDate.Date)
+                    break;
             }
             if (!bAdded && itemInListIndex >= 0)
                 listBoxToCome.Items.RemoveAt(itemInListIndex);
@@ -89,15 +90,17 @@ namespace Compta
             listBoxToCome.Sorted = true;
         }
 
-        public void AddItemToCome(ListBoxSortedByDate listBoxToCome, int itemInListIndex, string sToCome, TTransactionInfo copyInfo, DateTime nextPaiementDate)
+        public void AddItemToCome(ListBoxSortedByDate listBoxToCome, int itemInListIndex, string sToCome, TTransactionInfo copyInfo, 
+            DateTime nextPaiementDate, double nextPaiementAmount)
         {
-            TDisplayInfo displayInfo = new TDisplayInfo(sToCome, copyInfo.m_ID, copyInfo.m_OrderID, copyInfo.m_Type, copyInfo.m_AccountId);
+            var toComeInfo = new TToComeInfo(sToCome, copyInfo.m_ID, copyInfo.m_OrderID, copyInfo.m_Type, copyInfo.m_AccountId,
+                nextPaiementAmount);
 
-            displayInfo.Date = nextPaiementDate;
+            toComeInfo.Date = nextPaiementDate;
             if (itemInListIndex >= 0)
-                listBoxToCome.Items[itemInListIndex] = displayInfo;
+                listBoxToCome.Items[itemInListIndex] = toComeInfo;
             else
-                listBoxToCome.Items.Add(displayInfo);
+                listBoxToCome.Items.Add(toComeInfo);
         }
 
         public void DeleteToComeTransaction(TDisplayInfo info)

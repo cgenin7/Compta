@@ -129,11 +129,11 @@ namespace Comptability
                 double AmountRemaining = info.m_Amount - GetTotalAmountPayed(info, 1);
                 if (info.m_StartDate.Date < ActualDate.Date && AmountRemaining > 0)
                     if (info.m_Type == EType.e_Income)
-                        info.m_Warning = "La date de la transaction est expirée mais le montant n'a pas été encaissé.";
+                        info.m_Warning = $"La date de la transaction est expirée mais {ClassTools.ConvertCurrencyToString(AmountRemaining)} n'ont pas été encaissés.";
                     else
-                        info.m_Warning = "La date de la transaction est expirée mais le montant n'a pas été déboursé.";
+                        info.m_Warning = $"La date de la transaction est expirée mais {ClassTools.ConvertCurrencyToString(AmountRemaining)} n'ont pas été déboursés.";
                 else if (AmountRemaining < 0)
-                    info.m_Warning = "Le montant restant est négatif pour cette transaction.";
+                    info.m_Warning = $"Le montant restant est négatif pour cette transaction: {ClassTools.ConvertCurrencyToString(AmountRemaining)}";
                 return AmountRemaining;
             }
             return 0;

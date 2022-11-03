@@ -20,8 +20,8 @@ namespace Compta
 
                         while (counter > 0)
                         {
-                            TDisplayInfo info = Items[counter] as TDisplayInfo;
-                            TDisplayInfo previousInfo = Items[counter - 1] as TDisplayInfo;
+                            var info = Items[counter] as TToComeInfo;
+                            var previousInfo = Items[counter - 1] as TToComeInfo;
                             // Compare the items' date
                             if (info != null && previousInfo != null)
                             {
@@ -45,6 +45,20 @@ namespace Compta
             {
                 MessageBox.Show(ex.Message + " (" + ex.StackTrace + ")", "Erreur");
             }
+        }
+
+        public double GetTotalAmount()
+        {
+            double totalAmount = 0;
+
+            if (Items.Count > 0)
+            {
+                foreach (TToComeInfo item in Items)
+                {
+                    totalAmount += item.NextPaymentAmount;
+                }
+            }
+            return totalAmount;
         }
     }
 }

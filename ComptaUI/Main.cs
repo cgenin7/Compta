@@ -638,7 +638,7 @@ namespace Compta
             this.labelIncomesToCome.Name = "labelIncomesToCome";
             this.labelIncomesToCome.Size = new System.Drawing.Size(350, 23);
             this.labelIncomesToCome.TabIndex = 141;
-            this.labelIncomesToCome.Text = "Revenus d\'ici 2 semaines";
+            this.labelIncomesToCome.Text = "Revenus pour les 2 prochaines semaines:";
             // 
             // listBoxToComeIncome
             // 
@@ -817,7 +817,7 @@ namespace Compta
             this.labelExpensesToCome.Name = "labelExpensesToCome";
             this.labelExpensesToCome.Size = new System.Drawing.Size(350, 23);
             this.labelExpensesToCome.TabIndex = 16;
-            this.labelExpensesToCome.Text = "Dépenses d\'ici 2 semaines";
+            this.labelExpensesToCome.Text = "Dépenses pour les 2 prochaines semaines:";
             this.labelExpensesToCome.Click += new System.EventHandler(this.labelExpensesToCome_Click);
             // 
             // labelDollar0

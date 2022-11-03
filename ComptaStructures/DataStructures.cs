@@ -47,6 +47,17 @@ namespace ComptaCommun
         }
     }
 
+    public class TToComeInfo: TDisplayInfo
+    {
+        public TToComeInfo(string displayString, int id, int orderId, EType type, int accountId, double nextPaymentAmount):
+            base(displayString, id, orderId, type, accountId)
+        {
+            NextPaymentAmount = nextPaymentAmount;
+        }
+
+        public double NextPaymentAmount { get; private set; }
+    }
+
     public class TDisplayInfo
     {
         public TDisplayInfo(string displayString, int id, int orderId, EType type, int accountId)
@@ -63,7 +74,7 @@ namespace ComptaCommun
         public EType DataType;
         public DateTime Date;
         public int AccountId;
-
+     
         public override string ToString()
         {
             return DisplayString;
@@ -245,15 +256,6 @@ namespace ComptaCommun
         public int CategoryId;
         public EType Type;
         public double CategoryAmount;
-    }
-
-    public class TPretAmortissement
-    {
-        public DateTime PaiementDate;
-        public double CapitalPaied;
-        public double InterestPaied;
-        public double RemainingAmount;
-        public int NbDaysInPeriod;
     }
 
     public class TPredictedBalance
