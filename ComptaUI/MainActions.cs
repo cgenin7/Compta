@@ -73,11 +73,12 @@ namespace Compta
                     
                     bAdded = true;
                     sToCome = sAccountName + TextFormatter.FormatToComeTransactionText(copyInfo, nextPaiementDate);
+                    AddItemToCome(listBoxToCome, itemInListIndex, sToCome, copyInfo, nextPaiementDate);
+                    
                     startDate = nextPaiementDate.AddDays(1);
                     DateTime oldNextPaimentDate = nextPaiementDate;
                     nextPaiementDate = Util.GetNextPaiementDate(copyInfo, nextPaiementDate);
 
-                    AddItemToCome(listBoxToCome, itemInListIndex, sToCome, copyInfo, nextPaiementDate);
                     if (oldNextPaimentDate.Date == nextPaiementDate.Date)
                         break;
                 }
