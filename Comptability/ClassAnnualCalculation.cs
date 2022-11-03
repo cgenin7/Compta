@@ -10,6 +10,7 @@ namespace Comptability
         public static TAnnualRepartitionInfo CalculateAnnualTransactions(Dictionary<int, TTransactionInfo> transactions, int year, int accountId)
         {
             TAnnualRepartitionInfo annualInfo = new TAnnualRepartitionInfo();
+            var accountsToExclude = ClassAccounts.GetAccounts().GetRemovedFromSummaryAccounts();
 
             if (transactions != null)
             {
@@ -19,8 +20,8 @@ namespace Comptability
 
                     string sCategory = ClassTools.GetCategory(info.m_Category, ClassTransactions.GetTransactions().Categories);
 
-                    if (AddInAnnualReport(info, accountId))
-                        CalculateAnnualTransaction(year, info, accountId, annualInfo);
+                    if (AddInAnnualReport(info, accountId, accountsToExclude))
+                        CalculateAnnualTransaction(year, info, annualInfo);
                 }
             }
 
@@ -42,17 +43,17 @@ namespace Comptability
             return 0;
         }
 
-        private static bool AddInAnnualReport(TTransactionInfo info, int accountId)
+        private static bool AddInAnnualReport(TTransactionInfo info, int accountId, List<int> accountsToExclude)
         {
             if (accountId == -1 || info.m_AccountId == accountId)
             {
-                if (!info.m_RemoveFromAnnualReport)
+                if (!info.m_RemoveFromAnnualReport && (accountId != -1 || !accountsToExclude.Contains(info.m_AccountId)))
                     return true;
             }
             return false;
         }
 
-        private static void CalculateAnnualTransaction(int year, TTransactionInfo info, int accountId, TAnnualRepartitionInfo annualInfo)
+        private static void CalculateAnnualTransaction(int year, TTransactionInfo info, TAnnualRepartitionInfo annualInfo)
         {
             EType detailType = EType.e_Expense;
             double amount = GetAnnualTransactionBalance(year, info);
