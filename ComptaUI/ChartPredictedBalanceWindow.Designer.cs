@@ -34,7 +34,7 @@
             System.Windows.Forms.DataVisualization.Charting.DataPoint dataPoint2 = new System.Windows.Forms.DataVisualization.Charting.DataPoint(3D, -30D);
             this.chartPredictedBalances = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.buttonClose = new System.Windows.Forms.Button();
-            this.labelIncomesToCome = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.chartPredictedBalances)).BeginInit();
             this.SuspendLayout();
             // 
@@ -99,17 +99,17 @@
             this.buttonClose.UseVisualStyleBackColor = true;
             this.buttonClose.Click += new System.EventHandler(this.buttonClose_Click);
             // 
-            // labelIncomesToCome
+            // label1
             // 
-            this.labelIncomesToCome.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.labelIncomesToCome.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold);
-            this.labelIncomesToCome.Location = new System.Drawing.Point(126, 20);
-            this.labelIncomesToCome.Name = "labelIncomesToCome";
-            this.labelIncomesToCome.Size = new System.Drawing.Size(1378, 44);
-            this.labelIncomesToCome.TabIndex = 171;
-            this.labelIncomesToCome.Text = "SOLDES PRÉDITS";
-            this.labelIncomesToCome.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold);
+            this.label1.Location = new System.Drawing.Point(126, 20);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(1378, 44);
+            this.label1.TabIndex = 171;
+            this.label1.Text = "SOLDES PRÉDITS";
+            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // ChartPredictedBalanceWindow
             // 
@@ -117,7 +117,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1536, 741);
             this.ControlBox = false;
-            this.Controls.Add(this.labelIncomesToCome);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.buttonClose);
             this.Controls.Add(this.chartPredictedBalances);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
@@ -135,6 +135,6 @@
         #endregion
         private System.Windows.Forms.DataVisualization.Charting.Chart chartPredictedBalances;
         private System.Windows.Forms.Button buttonClose;
-        private System.Windows.Forms.Label labelIncomesToCome;
+        private System.Windows.Forms.Label label1;
     }
 }

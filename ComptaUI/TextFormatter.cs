@@ -29,6 +29,26 @@ namespace Compta
             return sToCome;
         }
 
+		public static string FormatAvertissementText( TTransactionInfo info )
+		{
+			if ( !string.IsNullOrEmpty(info.m_Warning))
+			{
+                string type = "Revenu '";
+                
+                switch (info.m_Type)
+                {
+                    case EType.e_Income:
+                        type = "Revenu '";
+                        break;
+                    case EType.e_Expense: 
+                        type = "Dépense '";
+                        break;
+                }
+				return (type + info.m_TransactionName + "' : " + info.m_Warning);
+			}
+			return "";
+		}
+
 		public static string FormatHistorique( THistoryInfo info )
 		{
             double balance = info.m_AccountBalance + info.m_Incomes + info.m_TransferIncomes - info.m_Expenses - info.m_TransferExpenses;
