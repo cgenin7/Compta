@@ -153,7 +153,7 @@ namespace Compta
         private Label labelBudgetYear;
         private Label labelPredictedBalance0;
         private Label labelNotes0;
-        private Label labelAVenir;
+        private Label labelExpensesToCome;
         private Label labelDollar0;
         private Label labelSoldeActuel0;
         private System.Windows.Forms.DataVisualization.Charting.Chart chartPredictedBalances;
@@ -162,7 +162,7 @@ namespace Compta
         private TabPage tabPageLeftSummary;
         private Label labelPredictedDate0;
         private ListBoxSortedByDate listBoxToComeIncome;
-        private Label label1;
+        private Label labelIncomesToCome;
         private ToolStripMenuItem aProposToolStripMenuItem;
 
 
@@ -342,7 +342,7 @@ namespace Compta
             this.toolTipPrets4 = new System.Windows.Forms.ToolTip(this.components);
             this.tabControlMain = new Compta.CustomControls.TabControlEx();
             this.tabPageSolde = new System.Windows.Forms.TabPage();
-            this.label1 = new System.Windows.Forms.Label();
+            this.labelIncomesToCome = new System.Windows.Forms.Label();
             this.listBoxToComeIncome = new Compta.ListBoxSortedByDate();
             this.listBoxToComeExpense = new Compta.ListBoxSortedByDate();
             this.TextBoxNotes0 = new System.Windows.Forms.TextBox();
@@ -356,7 +356,7 @@ namespace Compta
             this.labelPredictedBalance0 = new System.Windows.Forms.Label();
             this.labelPredictedDate0 = new System.Windows.Forms.Label();
             this.labelNotes0 = new System.Windows.Forms.Label();
-            this.labelAVenir = new System.Windows.Forms.Label();
+            this.labelExpensesToCome = new System.Windows.Forms.Label();
             this.labelDollar0 = new System.Windows.Forms.Label();
             this.labelSoldeActuel0 = new System.Windows.Forms.Label();
             this.chartPredictedBalances = new System.Windows.Forms.DataVisualization.Charting.Chart();
@@ -605,7 +605,7 @@ namespace Compta
             this.tabPageSolde.AutoScroll = true;
             this.tabPageSolde.AutoScrollMinSize = new System.Drawing.Size(1225, 650);
             this.tabPageSolde.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(230)))), ((int)(((byte)(230)))), ((int)(((byte)(235)))));
-            this.tabPageSolde.Controls.Add(this.label1);
+            this.tabPageSolde.Controls.Add(this.labelIncomesToCome);
             this.tabPageSolde.Controls.Add(this.listBoxToComeIncome);
             this.tabPageSolde.Controls.Add(this.listBoxToComeExpense);
             this.tabPageSolde.Controls.Add(this.TextBoxNotes0);
@@ -619,7 +619,7 @@ namespace Compta
             this.tabPageSolde.Controls.Add(this.labelPredictedBalance0);
             this.tabPageSolde.Controls.Add(this.labelPredictedDate0);
             this.tabPageSolde.Controls.Add(this.labelNotes0);
-            this.tabPageSolde.Controls.Add(this.labelAVenir);
+            this.tabPageSolde.Controls.Add(this.labelExpensesToCome);
             this.tabPageSolde.Controls.Add(this.labelDollar0);
             this.tabPageSolde.Controls.Add(this.labelSoldeActuel0);
             this.tabPageSolde.Controls.Add(this.chartPredictedBalances);
@@ -630,15 +630,15 @@ namespace Compta
             this.tabPageSolde.TabIndex = 0;
             this.tabPageSolde.Text = "Solde des comptes";
             // 
-            // label1
+            // labelIncomesToCome
             // 
-            this.label1.BackColor = System.Drawing.Color.Transparent;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(24, 414);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(271, 23);
-            this.label1.TabIndex = 141;
-            this.label1.Text = "Revenus d\'ici 2 semaines";
+            this.labelIncomesToCome.BackColor = System.Drawing.Color.Transparent;
+            this.labelIncomesToCome.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelIncomesToCome.Location = new System.Drawing.Point(24, 414);
+            this.labelIncomesToCome.Name = "labelIncomesToCome";
+            this.labelIncomesToCome.Size = new System.Drawing.Size(271, 23);
+            this.labelIncomesToCome.TabIndex = 141;
+            this.labelIncomesToCome.Text = "Revenus des 7 prochains jours";
             // 
             // listBoxToComeIncome
             // 
@@ -809,16 +809,16 @@ namespace Compta
             this.labelNotes0.TabIndex = 18;
             this.labelNotes0.Text = "Notes";
             // 
-            // labelAVenir
+            // labelExpensesToCome
             // 
-            this.labelAVenir.BackColor = System.Drawing.Color.Transparent;
-            this.labelAVenir.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelAVenir.Location = new System.Drawing.Point(24, 224);
-            this.labelAVenir.Name = "labelAVenir";
-            this.labelAVenir.Size = new System.Drawing.Size(271, 23);
-            this.labelAVenir.TabIndex = 16;
-            this.labelAVenir.Text = "Dépenses d\'ici 2 semaines";
-            this.labelAVenir.Click += new System.EventHandler(this.labelAVenir_Click);
+            this.labelExpensesToCome.BackColor = System.Drawing.Color.Transparent;
+            this.labelExpensesToCome.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelExpensesToCome.Location = new System.Drawing.Point(24, 224);
+            this.labelExpensesToCome.Name = "labelExpensesToCome";
+            this.labelExpensesToCome.Size = new System.Drawing.Size(271, 23);
+            this.labelExpensesToCome.TabIndex = 16;
+            this.labelExpensesToCome.Text = "Dépenses des 7 prochains jours";
+            this.labelExpensesToCome.Click += new System.EventHandler(this.labelAVenir_Click);
             // 
             // labelDollar0
             // 

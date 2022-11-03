@@ -15,13 +15,14 @@ namespace Compta
                     bool swapped;
                     do
                     {
-                        int counter = Items.Count - 1;
+                        int counter = 1;
                         swapped = false;
 
-                        while (counter > 0)
+                        while (counter < Items.Count)
                         {
-                            TDisplayInfo info = Items[counter] as TDisplayInfo;
                             TDisplayInfo previousInfo = Items[counter - 1] as TDisplayInfo;
+                            TDisplayInfo info = Items[counter] as TDisplayInfo;
+
                             // Compare the items' date
                             if (info != null && previousInfo != null)
                             {
@@ -33,8 +34,8 @@ namespace Compta
                                     Items[counter - 1] = temp;
                                     swapped = true;
                                 }
-                                // Decrement the counter.
-                                counter -= 1;
+                                // Increment the counter.
+                                counter++;
                             }
                         }
                     }
@@ -45,6 +46,18 @@ namespace Compta
             {
                 MessageBox.Show(ex.Message + " (" + ex.StackTrace + ")", "Erreur");
             }
+        }
+
+        public double GetTotalAmount()
+        {
+            double totalAmount = 0;
+            if (Items.Count > 0)
+            {
+                foreach (var item in Items)
+                    totalAmount += (item as TDisplayInfo).WarningAmount;
+            }
+
+            return totalAmount;
         }
     }
 }

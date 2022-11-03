@@ -98,6 +98,7 @@ namespace Comptability
         public static double GetTransactionBalance(DateTime ActualDate, DateTime PredictionDate, ref TTransactionInfo info, bool calculateManualTrans = true)
         {
             info.m_Warning = "";
+            info.m_WarningAmount = 0;
             info.m_FirstPaiementDate = DateTime.MinValue;
             info.m_LastPaiementDate = DateTime.MinValue;
 
@@ -126,15 +127,17 @@ namespace Comptability
             }
             else
             {
-                double AmountRemaining = info.m_Amount - GetTotalAmountPayed(info, 1);
-                if (info.m_StartDate.Date < ActualDate.Date && AmountRemaining > 0)
+                info.m_WarningAmount = info.m_Amount - GetTotalAmountPayed(info, 1);
+                var strAmount = ClassTools.ConvertCurrencyToString(info.m_WarningAmount);
+
+                if (info.m_StartDate.Date < ActualDate.Date && info.m_WarningAmount > 0)
                     if (info.m_Type == EType.e_Income)
-                        info.m_Warning = "La date de la transaction est expirée mais le montant n'a pas été encaissé.";
+                        info.m_Warning = $"La date de la transaction est expirée mais il reste {strAmount} à encaisser.";
                     else
-                        info.m_Warning = "La date de la transaction est expirée mais le montant n'a pas été déboursé.";
-                else if (AmountRemaining < 0)
-                    info.m_Warning = "Le montant restant est négatif pour cette transaction.";
-                return AmountRemaining;
+                        info.m_Warning = $"La date de la transaction est expirée mais il reste {strAmount} à débourser.";
+                else if (info.m_WarningAmount < 0)
+                    info.m_Warning = $"Le montant restant est négatif pour cette transaction: {strAmount}";
+                return info.m_WarningAmount;
             }
             return 0;
         }
@@ -345,20 +348,27 @@ namespace Comptability
             double AmountThatShouldHaveBeenPayedForThePeriod = TotalAmount - AmountRemainingInPeriod;
             if (AmountThatShouldHaveBeenPayedForThePeriod - AmountPayedForThePeriod >= 0.01)
             {
+                info.m_WarningAmount = TotalAmount - AmountPayedForThePeriod;
+                var strAmount = ClassTools.ConvertCurrencyToString(info.m_WarningAmount);
+                var strEndDate = ClassTools.ConvertDateToString(info.m_EndDate);
+                var normalAmount = ClassTools.ConvertCurrencyToString(TotalAmount - AmountThatShouldHaveBeenPayedForThePeriod);
+
                 if (info.m_Type == EType.e_Expense)
-                    info.m_Warning = "Le montant restant à dépenser d'ici le " + ClassTools.ConvertDateToString(info.m_EndDate) + " est de " + ClassTools.ConvertCurrencyToString(TotalAmount - AmountPayedForThePeriod) + ". Il devrait être de " + ClassTools.ConvertCurrencyToString(TotalAmount - AmountThatShouldHaveBeenPayedForThePeriod) + ".";
+                    info.m_Warning = $"Le montant restant à dépenser d'ici le {strEndDate} est de {strAmount}. Il devrait être de {normalAmount}.";
                 else
-                    info.m_Warning = "Le montant restant à recevoir d'ici le " + ClassTools.ConvertDateToString(info.m_EndDate) + " est de " + ClassTools.ConvertCurrencyToString(TotalAmount - AmountPayedForThePeriod) + ". Il devrait être de " + ClassTools.ConvertCurrencyToString(TotalAmount - AmountThatShouldHaveBeenPayedForThePeriod) + ".";
+                    info.m_Warning = $"Le montant restant à recevoir d'ici le  {strEndDate} est de {strAmount}. Il devrait être de {normalAmount}.";
             }
             else if (AmountPayedForThePeriod - AmountThatShouldHaveBeenPayedForThePeriod >= 0.01)
             {
-                double amountInAdvance = LastAmountEntered(info.m_AmountAlreadyPayed);
-                if (amountInAdvance > 0)
+                info.m_WarningAmount = LastAmountEntered(info.m_AmountAlreadyPayed);
+                if (info.m_WarningAmount > 0)
                 {
+                    var strAmount = ClassTools.ConvertCurrencyToString(info.m_WarningAmount);
+
                     if (info.m_Type == EType.e_Income)
-                        info.m_Warning = ClassTransactions.GOOD_NEWS + ClassTools.ConvertCurrencyToString(amountInAdvance) + " ont été reçu en avance.";
+                        info.m_Warning = $"{ClassTransactions.GOOD_NEWS} {strAmount} ont été reçu en avance.";
                     else if (info.m_Type == EType.e_Expense)
-                        info.m_Warning = ClassTransactions.GOOD_NEWS + ClassTools.ConvertCurrencyToString(amountInAdvance) + " ont été payés en avance.";
+                        info.m_Warning = $"{ClassTransactions.GOOD_NEWS} {strAmount} ont été payés en avance.";
                 }
             }
             else if (TotalAmount - AmountRemainingInPeriod < 0)

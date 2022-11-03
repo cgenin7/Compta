@@ -30,7 +30,7 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AddBudgetForm));
             this.comboBoxExistingNames = new System.Windows.Forms.ComboBox();
-            this.label1 = new System.Windows.Forms.Label();
+            this.labelIncomesToCome = new System.Windows.Forms.Label();
             this.checkBoxCopyFromOldBudget = new System.Windows.Forms.CheckBox();
             this.buttonCancel = new System.Windows.Forms.Button();
             this.buttonOK = new System.Windows.Forms.Button();
@@ -47,14 +47,14 @@
             this.comboBoxExistingNames.Size = new System.Drawing.Size(175, 21);
             this.comboBoxExistingNames.TabIndex = 1;
             // 
-            // label1
+            // labelIncomesToCome
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(13, 24);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(137, 13);
-            this.label1.TabIndex = 3;
-            this.label1.Text = "Année du nouveau budget:";
+            this.labelIncomesToCome.AutoSize = true;
+            this.labelIncomesToCome.Location = new System.Drawing.Point(13, 24);
+            this.labelIncomesToCome.Name = "labelIncomesToCome";
+            this.labelIncomesToCome.Size = new System.Drawing.Size(137, 13);
+            this.labelIncomesToCome.TabIndex = 3;
+            this.labelIncomesToCome.Text = "Année du nouveau budget:";
             // 
             // checkBoxCopyFromOldBudget
             // 
@@ -121,7 +121,7 @@
             this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.buttonOK);
             this.Controls.Add(this.checkBoxCopyFromOldBudget);
-            this.Controls.Add(this.label1);
+            this.Controls.Add(this.labelIncomesToCome);
             this.Controls.Add(this.comboBoxExistingNames);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "AddBudgetForm";
@@ -134,7 +134,7 @@
         #endregion
 
         private System.Windows.Forms.ComboBox comboBoxExistingNames;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label labelIncomesToCome;
         private System.Windows.Forms.CheckBox checkBoxCopyFromOldBudget;
         private System.Windows.Forms.Button buttonCancel;
         private System.Windows.Forms.Button buttonOK;

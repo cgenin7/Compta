@@ -49,12 +49,13 @@ namespace ComptaCommun
 
     public class TDisplayInfo
     {
-        public TDisplayInfo(string displayString, int id, int orderId, EType type, int accountId)
+        public TDisplayInfo(string displayString, int id, int orderId, EType type, int accountId, double warningAmount)
         {
             DisplayString = displayString;
             ID = id;
             DataType = type;
             AccountId = accountId;
+            WarningAmount = warningAmount;
         }
 
         public string DisplayString;
@@ -63,6 +64,7 @@ namespace ComptaCommun
         public EType DataType;
         public DateTime Date;
         public int AccountId;
+        public double WarningAmount;
 
         public override string ToString()
         {
@@ -143,6 +145,7 @@ namespace ComptaCommun
 
         // not saved in database
         public string m_Warning = "";
+        public double m_WarningAmount;
         public double m_Balance;
         public DateTime m_FirstPaiementDate;
         public DateTime m_LastPaiementDate;
@@ -181,6 +184,7 @@ namespace ComptaCommun
             m_TransactionName = info.m_TransactionName;
             m_Type = info.m_Type;
             m_Warning = info.m_Warning;
+            m_WarningAmount = info.m_WarningAmount;
             m_Category = info.m_Category;
             m_RemoveFromAnnualReport = info.m_RemoveFromAnnualReport;
         }
