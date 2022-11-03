@@ -123,8 +123,8 @@ namespace ComptaDB
                         info.m_AmountAlreadyPayed = aReader.GetString(11);
                         info.m_Note = aReader.GetString(12);
                         info.m_TransactionMode = (ETransactionMode)aReader.GetInt16(13);
-                        info.m_nextVirementDate = aReader.GetDateTime(16);
-                        info.m_nextVirementAmount = aReader.GetDouble(17);
+                        //info.m_nextVirementDate = aReader.GetDateTime(16);
+                        //info.m_nextVirementAmount = aReader.GetDouble(17);
                         info.m_Category = aReader.GetInt16(18);
                         info.m_Type = (EType)aReader.GetInt16(19);
                         
@@ -154,27 +154,22 @@ namespace ComptaDB
 
         private static string FormatInsertTransaction(TTransactionInfo info)
         {
-            return "INSERT INTO TransactionInfo (AccountId, TransactionName, Category, TransactionType, Amount, StartDate, EndDate, Period, PeriodLength, " +
-                " FirstTimeInMonth, SecondTimeInMonth, AmountAlreadyPayed, Notes, TransactionMode, NextVirementDate, NextVirementAmount, Type, " +
-                " RemoveFromAnnualReport, OrderID) VALUES (" +
-                info.m_AccountId + ", '" + info.m_TransactionName.Replace("'", "''") + "', " + info.m_Category + ", " + (int)info.m_eTransactionType + ", " +
-                info.m_Amount.ToString(NumberFormatInfo.InvariantInfo) + ", '" + info.m_StartDate.ToShortDateString() + "', '" + info.m_EndDate.ToShortDateString() + "', " +
-                info.m_Period.ToString() + ", " + (int)info.m_PeriodLength + ", " + info.m_FirstTimeInMonth + ", " + info.m_SecondTimeInMonth + ", '" +
-                info.m_AmountAlreadyPayed + "', '" + info.m_Note.Replace("'", "''") + "', " + (int)info.m_TransactionMode +
-                ", '" + info.m_nextVirementDate.ToShortDateString() + "', " + info.m_nextVirementAmount.ToString(NumberFormatInfo.InvariantInfo) + ", " + 
-                (int)info.m_Type + ", " + info.m_RemoveFromAnnualReport + ",  " + info.m_OrderID + ")";
+            return $@"INSERT INTO TransactionInfo (AccountId, TransactionName, Category, TransactionType, Amount, StartDate, EndDate, Period, PeriodLength,
+                FirstTimeInMonth, SecondTimeInMonth, AmountAlreadyPayed, Notes, TransactionMode, Type, RemoveFromAnnualReport, OrderID) 
+                VALUES ({info.m_AccountId}, '{info.m_TransactionName.Replace("'", "''")}', {info.m_Category}, {(int)info.m_eTransactionType}, 
+                {info.m_Amount.ToString(NumberFormatInfo.InvariantInfo)}, '{info.m_StartDate.ToShortDateString()}', '{info.m_EndDate.ToShortDateString()}', 
+                {info.m_Period}, {(int)info.m_PeriodLength}, {info.m_FirstTimeInMonth}, {info.m_SecondTimeInMonth}, '{info.m_AmountAlreadyPayed}', '{info.m_Note.Replace("'", "''")}', 
+                {(int)info.m_TransactionMode}, {(int)info.m_Type}, {info.m_RemoveFromAnnualReport}, {info.m_OrderID})";
         }
 
         private static string FormatUpdateTransactionInfoValues(TTransactionInfo info)
         {
-            return "UPDATE TransactionInfo SET AccountId = " + info.m_AccountId + ", TransactionName = '" + info.m_TransactionName.Replace("'", "''") + "', Category = " + info.m_Category + 
-                ", TransactionType = " + (int)info.m_eTransactionType + ", Amount = " + info.m_Amount.ToString(NumberFormatInfo.InvariantInfo) +
-                ", StartDate = '" + info.m_StartDate.ToShortDateString() + "', EndDate = '" + info.m_EndDate.ToShortDateString() +
-                "', Period = " + info.m_Period + ", PeriodLength = " + (int)info.m_PeriodLength + ", FirstTimeInMonth = " + info.m_FirstTimeInMonth +
-                ", SecondTimeInMonth = " + info.m_SecondTimeInMonth + ", AmountAlreadyPayed = '" + info.m_AmountAlreadyPayed +
-                "', Notes = '" + info.m_Note.Replace("'", "''") + "', TransactionMode = " + (int)info.m_TransactionMode + 
-                ", NextVirementDate = '" + info.m_nextVirementDate.ToShortDateString() + "',  NextVirementAmount = " + info.m_nextVirementAmount.ToString(NumberFormatInfo.InvariantInfo)
-                + ", Type = " + (int)info.m_Type + ", RemoveFromAnnualReport = " + info.m_RemoveFromAnnualReport + ", OrderID = " + info.m_OrderID + " WHERE ID = " + info.m_ID;
+            return $@"UPDATE TransactionInfo SET AccountId = {info.m_AccountId}, TransactionName = '{info.m_TransactionName.Replace("'", "''")}', Category = {info.m_Category}, 
+                TransactionType = {(int)info.m_eTransactionType}, Amount = {info.m_Amount.ToString(NumberFormatInfo.InvariantInfo)}, StartDate = '{info.m_StartDate.ToShortDateString()}', 
+                EndDate = '{info.m_EndDate.ToShortDateString()}', Period = {info.m_Period}, PeriodLength = {(int)info.m_PeriodLength}, FirstTimeInMonth = {info.m_FirstTimeInMonth},
+                SecondTimeInMonth = {info.m_SecondTimeInMonth}, AmountAlreadyPayed = '{info.m_AmountAlreadyPayed}', Notes = '{info.m_Note.Replace("'", "''")}', 
+                TransactionMode = {(int)info.m_TransactionMode}, Type = {(int)info.m_Type}, RemoveFromAnnualReport = {info.m_RemoveFromAnnualReport}, OrderID = {info.m_OrderID} 
+                WHERE ID = {info.m_ID}";
         }
 
     }
