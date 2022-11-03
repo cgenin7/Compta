@@ -137,10 +137,6 @@ namespace ComptaCommun
         public string m_Note;
         public ETransactionMode m_TransactionMode;
         
-        // Virements
-        public DateTime m_nextVirementDate = DateTime.MinValue;
-        public double m_nextVirementAmount;
-
         // not saved in database
         public string m_Warning = "";
         public double m_Balance;
@@ -170,8 +166,6 @@ namespace ComptaCommun
             m_TransactionMode = info.m_TransactionMode;
             m_LastPaiementDate = info.m_LastPaiementDate;
             m_NbRemainingPaiements = info.m_NbRemainingPaiements;
-            m_nextVirementAmount = info.m_nextVirementAmount;
-            m_nextVirementDate = info.m_nextVirementDate;
             m_Note = info.m_Note;
             m_Period = info.m_Period;
             m_PeriodLength = info.m_PeriodLength;
