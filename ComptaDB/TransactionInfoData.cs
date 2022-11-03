@@ -96,7 +96,7 @@ namespace ComptaDB
             if (ClassDataAccess.OpenComptaDataSource(out DBConnection))
             {
                 //create the command object and store the sql query
-                OleDbCommand aCommand = new OleDbCommand("SELECT * FROM TransactionInfo ORDER BY RemoveFromAnnualReport, Category, OrderId", DBConnection);
+                OleDbCommand aCommand = new OleDbCommand("SELECT * FROM TransactionInfo ORDER BY OrderID", DBConnection);
                 try
                 {
                     //create the datareader object to connect to table
