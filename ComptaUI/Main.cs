@@ -634,9 +634,9 @@ namespace Compta
             // 
             this.labelIncomesToCome.BackColor = System.Drawing.Color.Transparent;
             this.labelIncomesToCome.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelIncomesToCome.Location = new System.Drawing.Point(24, 414);
+            this.labelIncomesToCome.Location = new System.Drawing.Point(15, 414);
             this.labelIncomesToCome.Name = "labelIncomesToCome";
-            this.labelIncomesToCome.Size = new System.Drawing.Size(271, 23);
+            this.labelIncomesToCome.Size = new System.Drawing.Size(350, 23);
             this.labelIncomesToCome.TabIndex = 141;
             this.labelIncomesToCome.Text = "Revenus des 7 prochains jours";
             // 
@@ -813,9 +813,9 @@ namespace Compta
             // 
             this.labelExpensesToCome.BackColor = System.Drawing.Color.Transparent;
             this.labelExpensesToCome.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelExpensesToCome.Location = new System.Drawing.Point(24, 224);
+            this.labelExpensesToCome.Location = new System.Drawing.Point(15, 224);
             this.labelExpensesToCome.Name = "labelExpensesToCome";
-            this.labelExpensesToCome.Size = new System.Drawing.Size(271, 23);
+            this.labelExpensesToCome.Size = new System.Drawing.Size(350, 23);
             this.labelExpensesToCome.TabIndex = 16;
             this.labelExpensesToCome.Text = "Dépenses des 7 prochains jours";
             this.labelExpensesToCome.Click += new System.EventHandler(this.labelAVenir_Click);
