@@ -36,14 +36,17 @@ namespace Compta
         public void AddToComeTransaction(TTransactionInfo info)
         {
             if (info.m_Type == EType.e_Expense)
+            {
                 AddToComeTransaction(info, listBoxToComeExpense);
+                var amount = ClassTools.ConvertCurrencyToString(listBoxToComeExpense.GetTotalAmount());
+                labelExpensesToCome.Text = $"Dépenses pour les 7 prochaines jours: {amount}";
+            }
             else
+            {
                 AddToComeTransaction(info, listBoxToComeIncome);
-
-            var amount = ClassTools.ConvertCurrencyToString(listBoxToComeExpense.GetTotalAmount());
-            labelExpensesToCome.Text = $"Dépenses pour les 2 prochaines semaines: {amount}";
-            amount = ClassTools.ConvertCurrencyToString(listBoxToComeIncome.GetTotalAmount());
-            labelIncomesToCome.Text = $"Revenus pour les 2 prochaines semaines: {amount}";
+                var amount = ClassTools.ConvertCurrencyToString(listBoxToComeIncome.GetTotalAmount());
+                labelIncomesToCome.Text = $"Revenus pour les 7 prochains jours: {amount}";
+            }
         }
 
         private void AddToComeTransaction(TTransactionInfo info, ListBoxSortedByDate listBoxToCome)
@@ -52,7 +55,7 @@ namespace Compta
 
             listBoxToCome.Sorted = false;
             TTransactionInfo copyInfo = new TTransactionInfo(info);
-            DateTime in15DaysTime = DateTime.Now.AddDays(15);
+            DateTime in7DaysTime = DateTime.Now.AddDays(7);
             bool bAdded = false;
             int itemInListIndex = GetListIndexFromId(listBoxToCome, copyInfo.m_ID);
 
@@ -65,7 +68,7 @@ namespace Compta
 
             DateTime startDate = DateTime.Now;
             copyInfo.m_Balance = 0;
-            while (nextPaiementDate.Date <= in15DaysTime.Date)
+            while (nextPaiementDate.Date <= in7DaysTime.Date)
             {
                 // Get next payment amount
                 ClassCalculation.GetTransactionBalance(startDate, nextPaiementDate, ref copyInfo, false);

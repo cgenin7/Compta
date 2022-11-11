@@ -134,7 +134,7 @@ namespace Compta
                     m_lastDisplayedTransaction.m_ID, m_lastDisplayedTransaction.m_OrderID, m_lastDisplayedTransaction.m_Type, 
                     m_lastDisplayedTransaction.m_AccountId);
 
-                // Add transaction info in ToCome list if something is going on for the next month
+                // Add transaction info in ToCome list if something is going on for the next week
                 if (m_lastDisplayedTransaction.m_Type == EType.e_Expense)
                     m_main.AddToComeTransaction(m_lastDisplayedTransaction);
                 else
