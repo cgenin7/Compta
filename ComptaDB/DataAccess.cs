@@ -55,21 +55,6 @@ namespace ComptaDB
             return true;
         }
 
-        internal static bool OpenPlacementsDataSource(out OleDbConnection DBConnection)
-        {
-            //create the database connection
-            DBConnection = new OleDbConnection("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + LocalSettings.PlacementsPath);
-            try
-            {
-                DBConnection.Open();
-            }
-            catch 
-            {
-                return false;
-            }
-            return true;
-        }
-
         internal static void CloseDataSource(OleDbConnection DBConnection)
         {
             try

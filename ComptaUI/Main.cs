@@ -222,6 +222,7 @@ namespace Compta
         {
             try
             {
+                // Make a backup of original file in case you decide not to save your changes
                 File.Copy(LocalSettings.DatabasePath, LocalSettings.DatabaseBackupPath, true);
 
                 SelectAccount accountForm = new SelectAccount(LocalSettings.DatabaseName);
@@ -238,6 +239,9 @@ namespace Compta
 
                 if (!File.Exists(LocalSettings.DatabasePath))
                     System.IO.File.Copy(ClassTools.GetConfigDir() + "EmptyBudget.mdb", LocalSettings.DatabasePath, false);
+
+                // Make a backup of original file in case you decide not to save your changes
+                File.Copy(LocalSettings.DatabasePath, LocalSettings.DatabaseBackupPath, true);
 
                 comboBoxBudgetName.SelectedIndexChanged -= new System.EventHandler(this.comboBoxBudgetYear_SelectedIndexChanged);
                 Utils.FillComboBudgetName(comboBoxBudgetName);
