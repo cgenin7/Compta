@@ -56,8 +56,6 @@ namespace ComptaDB
 
                 try
                 {
-                    ClassDataAccess.ExecuteCommand("DELETE FROM TransactionInfo WHERE AccountId = " + AccountId, MyTransaction, DBConnection);
-
                     if (transactions != null)
                     {
                         foreach (int transID in transactions.Keys)
@@ -66,7 +64,7 @@ namespace ComptaDB
                             if (info.m_AccountId == AccountId)
                             {
                                 //create the command object and store the sql query
-                                ClassDataAccess.ExecuteCommand(FormatInsertTransaction(info), MyTransaction, DBConnection);
+                                ClassDataAccess.ExecuteCommand(FormatUpdateTransactionInfoValues(info), MyTransaction, DBConnection);
                             }
                         }
                     }

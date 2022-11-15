@@ -163,11 +163,6 @@ namespace Compta
                             ClassTransactions.GetTransactions().DeleteTransactionFromDataStorage(info.ID);
                             UIControls.TransactionListBox.Items.RemoveAt(curSelection);
 
-                            if (curSelection > 0)
-                            {
-                                m_lastTransactionIndex = -1;
-                                UIControls.TransactionListBox.SelectedIndex = (curSelection - 1);
-                            }
                             if (UIControls.TransactionListBox.Items.Count <= 0)
                             {
                                 InitializeAllFields();
@@ -175,6 +170,7 @@ namespace Compta
                                 UIControls.ButtonCancelTransaction.Enabled = false;
                                 m_lastTransactionIndex = -1;
                             }
+                            
                             m_main.DeleteToComeTransaction(info);
                         }
                     }
