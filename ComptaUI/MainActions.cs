@@ -39,7 +39,7 @@ namespace Compta
             {
                 AddToComeTransaction(info, listBoxToComeExpense);
                 var amount = ClassTools.ConvertCurrencyToString(listBoxToComeExpense.GetTotalAmount());
-                labelExpensesToCome.Text = $"Dépenses pour les 7 prochaines jours: {amount}";
+                labelExpensesToCome.Text = $"Dépenses pour les 7 prochains jours: {amount}";
             }
             else
             {
@@ -70,6 +70,8 @@ namespace Compta
             copyInfo.m_Balance = 0;
             while (nextPaiementDate.Date <= in7DaysTime.Date)
             {
+                var oldNextPaimentDate = nextPaiementDate;
+
                 // Get next payment amount
                 ClassCalculation.GetTransactionBalance(startDate, nextPaiementDate, ref copyInfo, false);
                 if (copyInfo.m_Balance <= 0.01)
@@ -81,7 +83,6 @@ namespace Compta
                 AddItemToCome(listBoxToCome, itemInListIndex, sToCome, copyInfo, nextPaiementDate, copyInfo.m_Balance);
                     
                 startDate = nextPaiementDate.AddDays(1);
-                DateTime oldNextPaimentDate = nextPaiementDate;
                 nextPaiementDate = Util.GetNextPaiementDate(copyInfo, nextPaiementDate);
 
                 if (oldNextPaimentDate.Date == nextPaiementDate.Date)
@@ -436,7 +437,7 @@ namespace Compta
             ListBoxHistorique5.Select();
         }
 
-        // Add transaction info in ToCome list if something is going on for the next month
+        // Add transaction info in ToCome list if something is going on for the next 7 days
         private void FillUpToComeForAllAccounts()
         {
             var accountsToExclude = ClassAccounts.GetAccounts().GetRemovedFromSummaryAccounts();

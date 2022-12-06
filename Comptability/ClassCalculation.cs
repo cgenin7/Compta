@@ -127,7 +127,7 @@ namespace Comptability
             else
             {
                 double AmountRemaining = info.m_Amount - GetTotalAmountPayed(info, 1);
-                if (info.m_StartDate.Date < ActualDate.Date && AmountRemaining > 0)
+                if (info.m_StartDate.Date <= ActualDate.Date && AmountRemaining > 0)
                     if (info.m_Type == EType.e_Income)
                         info.m_Warning = $"La date de la transaction est expirée mais {ClassTools.ConvertCurrencyToString(AmountRemaining)} n'ont pas été encaissés.";
                     else

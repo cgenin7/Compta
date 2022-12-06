@@ -266,7 +266,7 @@ namespace Compta
                 else
                     UIControls.TransactionListBox.Items[listIndex] = displayInfo;
             }
-            // Add transaction info in ToCome list if something is going on for the next month
+            // Add transaction info in ToCome list if something is going on for the next week
             m_main.AddToComeTransaction(info);
             return textToDisplay != "";
         }

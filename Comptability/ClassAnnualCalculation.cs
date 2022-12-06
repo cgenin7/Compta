@@ -45,12 +45,17 @@ namespace Comptability
 
         private static bool AddInAnnualReport(TTransactionInfo info, int accountId, List<int> accountsToExclude)
         {
-            if (accountId == -1 || info.m_AccountId == accountId)
+            if (accountId == -1)
             {
-                if (!info.m_RemoveFromAnnualReport && (accountId != -1 || !accountsToExclude.Contains(info.m_AccountId)))
-                    return true;
+                if (accountsToExclude.Contains(info.m_AccountId))
+                    return false;
             }
-            return false;
+            else
+            {
+                if (info.m_AccountId != accountId)
+                    return false;
+            }
+            return !info.m_RemoveFromAnnualReport;
         }
 
         private static void CalculateAnnualTransaction(int year, TTransactionInfo info, TAnnualRepartitionInfo annualInfo)
