@@ -85,9 +85,6 @@ namespace Comptability
                     nbPeriods++;
                     nextDate = GetNextPaiementDate(info, nextDate);
                 }
-                // special case for a period a every week starting on january first and ending on december 31, otherwise it gives 53 weeks instead of 52
-                if (info.m_PeriodLength == EPeriodLength.e_PerWeek && startDate.Day == 1 && startDate.Month == 1 && endDate.Day == 31 && endDate.Month == 12)
-                    nbPeriods--;
             }
 
             return nbPeriods;

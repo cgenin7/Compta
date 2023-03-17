@@ -1,16 +1,10 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Globalization;
 
 namespace ComptaCommun
 {
-    public class FormulaParser
+    public static class FormulaParser
     {
-        private FormulaParser()
-        {
-        }
-
         public static double Calculate(string formula)
         {
             if (formula.Length > 0 && (formula[0] == '+' || formula[0] == '-'))

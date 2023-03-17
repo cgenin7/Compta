@@ -4,10 +4,6 @@ using System.Collections.Generic;
 
 namespace ComptaCommun
 {
-    /// <summary>
-    /// Summary description for ClassDataAccess.
-    /// </summary>
-    /// 
     public class TWarningInfo
     {
         public bool m_IsRevenu;
