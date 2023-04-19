@@ -61,10 +61,11 @@ namespace Compta
 
             DateTime nextPaiementDate = copyInfo.m_FirstPaiementDate.Date;
            
+            if (!string.IsNullOrWhiteSpace(copyInfo.m_Warning))
+                nextPaiementDate = DateTime.Now;
+
             if (copyInfo.m_eTransactionType == ETransactionType.e_OneShotTransaction)
-            {
                 nextPaiementDate = copyInfo.m_StartDate;
-            }
 
             DateTime startDate = DateTime.Now;
             copyInfo.m_Balance = 0;
@@ -88,6 +89,7 @@ namespace Compta
                 if (oldNextPaimentDate.Date == nextPaiementDate.Date)
                     break;
             }
+
             if (!bAdded && itemInListIndex >= 0)
                 listBoxToCome.Items.RemoveAt(itemInListIndex);
 
