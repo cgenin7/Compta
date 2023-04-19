@@ -19,9 +19,7 @@ namespace ComptaCommun
         public DateTime StartPrediction;
         public DateTime PredictionDate;
         public double IncomesAtPredictionDate;
-        public double TransferIncomes;
         public double ExpensesAtPredictionDate;
-        public double TransferExpenses;
         public string Note;
         public double MortgageBalance;
         public bool RemoveFromSummary;
@@ -91,8 +89,6 @@ namespace ComptaCommun
         public int m_AccountId;
         public double m_Incomes;
         public double m_Expenses;
-        public double m_TransferIncomes;
-        public double m_TransferExpenses;
         public double m_AccountBalance;
     }
 

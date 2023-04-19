@@ -411,9 +411,7 @@ namespace Compta
             TAccountInfo account = ClassAccounts.GetAccounts().AccountsInfo[m_currentAccountId];
 
             account.IncomesAtPredictionDate = predictedBalance.Incomes;
-            account.TransferIncomes = predictedBalance.Incomes;
             account.ExpensesAtPredictionDate = predictedBalance.Expenses;
-            account.TransferExpenses = predictedBalance.Expenses;
             account.MortgageBalance = predictedBalance.TotalPretsRemaining;
             
             ClassAccounts.GetAccounts().SaveAccountsInDataStorage(out exception);
@@ -742,10 +740,8 @@ namespace Compta
             historyInfo.m_AccountId = info.AccountId;
             historyInfo.m_PredictionDate = info.PredictionDate;
          
-            historyInfo.m_Incomes = info.IncomesAtPredictionDate - info.TransferIncomes;
-            historyInfo.m_TransferIncomes = info.TransferIncomes;
-            historyInfo.m_Expenses = info.ExpensesAtPredictionDate - info.TransferExpenses;
-            historyInfo.m_TransferExpenses = info.TransferExpenses;
+            historyInfo.m_Incomes = info.IncomesAtPredictionDate;
+            historyInfo.m_Expenses = info.ExpensesAtPredictionDate;
             historyInfo.m_AccountBalance = info.Balance;
         }
 

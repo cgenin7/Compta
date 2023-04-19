@@ -70,13 +70,12 @@ namespace ComptaDB
                             //create the command object and store the sql query
                             try  // new fields, not present in old DB
                             {
-                                ClassDataAccess.ExecuteCommand(FormatHistoryStartCmd(historyInfo) + ", " + historyInfo.m_TransferIncomes.ToString(NumberFormatInfo.InvariantInfo) + ", " +
-                                    historyInfo.m_TransferExpenses.ToString(NumberFormatInfo.InvariantInfo) + ", '" + historyInfo.m_PredictionDate.ToShortDateString() + "' )", MyTransaction, DBConnection);
+                                ClassDataAccess.ExecuteCommand($"{FormatHistoryStartCmd(historyInfo)}, " +
+                                    $"'{historyInfo.m_PredictionDate.ToShortDateString()}'", 
+                                    MyTransaction, DBConnection);
                             }
                             catch
                             {
-                                historyInfo.m_Expenses += historyInfo.m_TransferExpenses;
-                                historyInfo.m_Incomes += historyInfo.m_TransferIncomes;
                                 ClassDataAccess.ExecuteCommand(FormatHistoryShortCmd(historyInfo) + " )", MyTransaction, DBConnection);
                             }
                         }
@@ -100,9 +99,9 @@ namespace ComptaDB
 
         private static string FormatHistoryStartCmd(THistoryInfo info)
         {
-            return "INSERT INTO HistoryInfo (HistoryDate, AccountId, Income, Expenses, AccountBalance, TransferIncome, TransferExpenses, PredictionDate) VALUES ( '" + info.m_HistoryDate.ToShortDateString() + "', " + info.m_AccountId +
-                                    ", " + info.m_Incomes.ToString(NumberFormatInfo.InvariantInfo) + ", " +
-                                    info.m_Expenses.ToString(NumberFormatInfo.InvariantInfo) + ", " + info.m_AccountBalance.ToString(NumberFormatInfo.InvariantInfo);
+            return "INSERT INTO HistoryInfo (HistoryDate, AccountId, Income, Expenses, AccountBalance, PredictionDate) VALUES ( " + 
+                    $"'{info.m_HistoryDate.ToShortDateString()}', {info.m_AccountId}, {info.m_Incomes.ToString(NumberFormatInfo.InvariantInfo)}, " +
+                    $"{info.m_Expenses.ToString(NumberFormatInfo.InvariantInfo)}, {info.m_AccountBalance.ToString(NumberFormatInfo.InvariantInfo)}";
         }
 
         private static string FormatHistoryShortCmd(THistoryInfo info)

@@ -51,12 +51,12 @@ namespace Compta
 
 		public static string FormatHistorique( THistoryInfo info )
 		{
-            double balance = info.m_AccountBalance + info.m_Incomes + info.m_TransferIncomes - info.m_Expenses - info.m_TransferExpenses;
+            double balance = info.m_AccountBalance + info.m_Incomes - info.m_Expenses;
 
-            string sHistorique = "Le " + ClassTools.ConvertDateToString(info.m_HistoryDate) + ", le solde prédit pour la fin de l'année était de " + ClassTools.ConvertCurrencyToString(balance) +
-                    " (Solde: " + ClassTools.ConvertCurrencyToString(info.m_AccountBalance) + ", revenus: " + ClassTools.ConvertCurrencyToString(info.m_Incomes + info.m_TransferIncomes);
-            
-            sHistorique += ",dépenses: " + ClassTools.ConvertCurrencyToString(info.m_Expenses + info.m_TransferExpenses);
+            string sHistorique = $"Le {ClassTools.ConvertDateToString(info.m_HistoryDate)}, le solde prédit pour la fin de l'année était de " +
+                $"{ClassTools.ConvertCurrencyToString(balance)}. (Solde: {ClassTools.ConvertCurrencyToString(info.m_AccountBalance)}, " +
+                $"revenus: {ClassTools.ConvertCurrencyToString(info.m_Incomes)}, " +
+                $"dépenses: {ClassTools.ConvertCurrencyToString(info.m_Expenses)}";
             
             sHistorique += " )";
             return sHistorique;
