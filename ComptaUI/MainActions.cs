@@ -61,14 +61,15 @@ namespace Compta
 
             DateTime nextPaiementDate = copyInfo.m_FirstPaiementDate.Date;
            
-            if (!string.IsNullOrWhiteSpace(copyInfo.m_Warning))
-                nextPaiementDate = DateTime.Now;
-
             if (copyInfo.m_eTransactionType == ETransactionType.e_OneShotTransaction)
                 nextPaiementDate = copyInfo.m_StartDate;
 
+            if (copyInfo.m_TransactionMode == ETransactionMode.e_Manual && !string.IsNullOrWhiteSpace(copyInfo.m_Warning))
+                nextPaiementDate = DateTime.Now;
+
             DateTime startDate = DateTime.Now;
             copyInfo.m_Balance = 0;
+
             while (nextPaiementDate.Date <= in7DaysTime.Date)
             {
                 var oldNextPaimentDate = nextPaiementDate;
