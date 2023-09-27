@@ -1,0 +1,28 @@
+@page
+@model ComptaIdentityProvider.Pages.ChangePassword.Index
+
+<div class="login-page">
+    <div class="lead">
+        <h1>Change Password</h1>
+    </div>
+
+    <partial name="_ValidationSummary" />
+
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="card">
+                <div class="card-body">
+                    <form asp-page="/Account/ChangePassword/Index">
+
+                        <div class="form-group">
+                            <label asp-for="Input.Password"></label>
+                            <input type="password" class="form-control" placeholder="Password" asp-for="Input.Password" autocomplete="off">
+                        </div>
+                            
+                        <button class="btn btn-primary">Change password</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
