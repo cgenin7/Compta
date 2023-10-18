@@ -1,3 +1,92 @@
+$background-color: #e6e4d6; // Soft beige
+$card-bg: #fff9f0; // Ivory white
+$text-color: #6b4423; // Brownish tone
+$soft-green: #8c8c6a; // Muted green tone
+$taupe: #c1b2a6; // Taupe color
+$earthy-brown: #b5a580;
+$dark-taupe: #948c75;
+$alert-bg: #f7e1d4; // Soft peach
+$alert-text: #a87458; // Warm brown
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: $background-color;
+}
+
+.login-page {
+    max-width: 600px;
+    margin: 100px auto;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background-color: $card-bg;
+    border-radius: 8px;
+
+    .row {
+        .card {
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+
+            .card-header {
+                background-color: $taupe;
+                color: #fff;
+                font-size: 1.1em;
+                border-radius: 8px 8px 0 0;
+                padding: 7px 12px;
+            }
+
+            .card-body {
+                padding: 15px;
+
+                .form-group {
+                    margin-bottom: 15px;
+
+                    .form-control {
+                        padding: 10px;
+                        border-radius: 5px;
+                        border: 1px solid lighten($taupe, 10%);
+                        font-size: 0.95em;
+                    }
+
+                    .form-check-label {
+                        font-size: 0.9em;
+                        color: $text-color;
+                    }
+                }
+            }
+        }
+    }
+
+    .btn {
+        margin: 5px 0;
+        border: none;
+        border-radius: 5px;
+        padding: 10px 15px;
+        font-size: 1em;
+        cursor: pointer;
+        transition: background-color 0.3s;
+
+        &.btn-primary {
+            background-color: $earthy-brown;
+            color: #fff;
+
+            &:hover {
+                background-color: darken($earthy-brown, 7%);
+            }
+        }
+
+        &.btn-secondary {
+            background-color: $dark-taupe;
+            color: #fff;
+
+            &:hover {
+                background-color: darken($dark-taupe, 7%);
+            }
+        }
+    }
+}
+
 .welcome-page {
   .logo {
     width: 64px;
